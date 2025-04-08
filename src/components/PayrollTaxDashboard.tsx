@@ -12,6 +12,7 @@ interface TaxParameter {
 
 interface TaxConfig {
   parameters: TaxParameter[];
+  drivenBy: 'workplace' | 'residence' | 'primary-workplace' | 'all';
 }
 
 interface JurisdictionTaxes {
@@ -58,14 +59,16 @@ const PayrollTaxDashboard = () => {
           { id: 'w4OtherIncome', name: 'Other Income', type: 'currency' },
           { id: 'w4Deductions', name: 'Deductions', type: 'currency' },
           { id: 'w4ExtraWithholding', name: 'Extra Withholding', type: 'currency' }
-        ]
+        ],
+        drivenBy: 'all'
       },
       "FICA - Social Security": {
         parameters: [
           { id: 'ficaSSWage', name: 'YTD Social Security Wages', type: 'currency', readonly: true },
           { id: 'ficaSSRate', name: 'Current Rate', type: 'percentage', value: '6.2%', readonly: true },
           { id: 'ficaSSCap', name: 'Annual Cap', type: 'currency', value: '$160,200', readonly: true }
-        ]
+        ],
+        drivenBy: 'all'
       },
       "FICA - Medicare": {
         parameters: [
@@ -73,14 +76,16 @@ const PayrollTaxDashboard = () => {
           { id: 'ficaMedRate', name: 'Base Rate', type: 'percentage', value: '1.45%', readonly: true },
           { id: 'ficaMedAddlRate', name: 'Additional Rate', type: 'percentage', value: '0.9%', readonly: true },
           { id: 'ficaMedAddlThreshold', name: 'Additional Rate Threshold', type: 'currency', value: '$200,000', readonly: true }
-        ]
+        ],
+        drivenBy: 'all'
       },
       "FUTA": {
         parameters: [
           { id: 'futaWage', name: 'YTD FUTA Wages', type: 'currency', readonly: true },
           { id: 'futaRate', name: 'Rate', type: 'percentage', value: '0.6%', readonly: true },
           { id: 'futaCap', name: 'Annual Cap', type: 'currency', value: '$7,000', readonly: true }
-        ]
+        ],
+        drivenBy: 'workplace'
       }
     },
     "California": {
@@ -89,21 +94,24 @@ const PayrollTaxDashboard = () => {
           { id: 'caFilingStatus', name: 'Filing Status', type: 'select', options: ['Single', 'Married', 'Head of Household'] },
           { id: 'caAllowances', name: 'Allowances', type: 'number' },
           { id: 'caAddlWithholding', name: 'Additional Withholding', type: 'currency' }
-        ]
+        ],
+        drivenBy: 'residence'
       },
       "CA SDI": {
         parameters: [
           { id: 'caSDIWage', name: 'YTD SDI Wages', type: 'currency', readonly: true },
           { id: 'caSDIRate', name: 'Rate', type: 'percentage', value: '1.1%', readonly: true },
           { id: 'caSDICap', name: 'Annual Cap', type: 'currency', value: '$153,164', readonly: true }
-        ]
+        ],
+        drivenBy: 'residence'
       },
       "CA SUI": {
         parameters: [
           { id: 'caSUIWage', name: 'YTD SUI Wages', type: 'currency', readonly: true },
           { id: 'caSUIRate', name: 'Rate', type: 'percentage', value: '3.4%', readonly: true },
           { id: 'caSUICap', name: 'Annual Cap', type: 'currency', value: '$7,000', readonly: true }
-        ]
+        ],
+        drivenBy: 'workplace'
       }
     },
     "New York": {
@@ -112,20 +120,23 @@ const PayrollTaxDashboard = () => {
           { id: 'nyFilingStatus', name: 'Filing Status', type: 'select', options: ['Single', 'Married Filing Jointly', 'Head of Household'] },
           { id: 'nyAllowances', name: 'Allowances', type: 'number' },
           { id: 'nyAddlWithholding', name: 'Additional Withholding', type: 'currency' }
-        ]
+        ],
+        drivenBy: 'residence'
       },
       "NY SDI": {
         parameters: [
           { id: 'nySDIRate', name: 'Weekly Rate', type: 'currency', value: '$0.50', readonly: true },
           { id: 'nySDICap', name: 'Annual Cap', type: 'currency', value: '$26.00', readonly: true }
-        ]
+        ],
+        drivenBy: 'workplace'
       },
       "NY Paid Family Leave": {
         parameters: [
           { id: 'nyPFLWage', name: 'YTD PFL Wages', type: 'currency', readonly: true },
           { id: 'nyPFLRate', name: 'Rate', type: 'percentage', value: '0.455%', readonly: true },
           { id: 'nyPFLCap', name: 'Annual Cap', type: 'currency', value: '$82,654', readonly: true }
-        ]
+        ],
+        drivenBy: 'workplace'
       }
     },
     "District of Columbia": {
@@ -134,13 +145,15 @@ const PayrollTaxDashboard = () => {
           { id: 'dcFilingStatus', name: 'Filing Status', type: 'select', options: ['Single', 'Married/Domestic Partner Filing Jointly', 'Head of Household'] },
           { id: 'dcAllowances', name: 'Allowances', type: 'number' },
           { id: 'dcAddlWithholding', name: 'Additional Withholding', type: 'currency' }
-        ]
+        ],
+        drivenBy: 'residence'
       },
       "DC Paid Family Leave": {
         parameters: [
           { id: 'dcPFLWage', name: 'YTD PFL Wages', type: 'currency', readonly: true },
           { id: 'dcPFLRate', name: 'Rate', type: 'percentage', value: '0.62%', readonly: true }
-        ]
+        ],
+        drivenBy: 'workplace'
       }
     },
     "New Jersey": {
@@ -149,28 +162,32 @@ const PayrollTaxDashboard = () => {
           { id: 'njFilingStatus', name: 'Filing Status', type: 'select', options: ['Single', 'Married/Civil Union Filing Jointly', 'Head of Household'] },
           { id: 'njAllowances', name: 'Allowances', type: 'number' },
           { id: 'njAddlWithholding', name: 'Additional Withholding', type: 'currency' }
-        ]
+        ],
+        drivenBy: 'residence'
       },
       "NJ Unemployment Insurance": {
         parameters: [
           { id: 'njUIWage', name: 'YTD UI Wages', type: 'currency', readonly: true },
           { id: 'njUIRate', name: 'Rate', type: 'percentage', value: '0.3825%', readonly: true },
           { id: 'njUICap', name: 'Annual Cap', type: 'currency', value: '$41,100', readonly: true }
-        ]
+        ],
+        drivenBy: 'workplace'
       },
       "NJ Disability Insurance": {
         parameters: [
           { id: 'njDIWage', name: 'YTD DI Wages', type: 'currency', readonly: true },
           { id: 'njDIRate', name: 'Rate', type: 'percentage', value: '0.16%', readonly: true },
           { id: 'njDICap', name: 'Annual Cap', type: 'currency', value: '$41,100', readonly: true }
-        ]
+        ],
+        drivenBy: 'residence'
       },
       "NJ Family Leave Insurance": {
         parameters: [
           { id: 'njFLIWage', name: 'YTD FLI Wages', type: 'currency', readonly: true },
           { id: 'njFLIRate', name: 'Rate', type: 'percentage', value: '0.14%', readonly: true },
           { id: 'njFLICap', name: 'Annual Cap', type: 'currency', value: '$41,100', readonly: true }
-        ]
+        ],
+        drivenBy: 'residence'
       }
     },
     "Virginia": {
@@ -179,7 +196,8 @@ const PayrollTaxDashboard = () => {
           { id: 'vaFilingStatus', name: 'Filing Status', type: 'select', options: ['Single', 'Married Filing Jointly', 'Head of Household'] },
           { id: 'vaExemptions', name: 'Exemptions', type: 'number' },
           { id: 'vaAddlWithholding', name: 'Additional Withholding', type: 'currency' }
-        ]
+        ],
+        drivenBy: 'residence'
       }
     },
     "Connecticut": {
@@ -188,7 +206,8 @@ const PayrollTaxDashboard = () => {
           { id: 'ctFilingStatus', name: 'Filing Status', type: 'select', options: ['Single', 'Married Filing Jointly', 'Head of Household'] },
           { id: 'ctWithholdingCode', name: 'Withholding Code', type: 'select', options: ['A', 'B', 'C', 'D', 'E', 'F'] },
           { id: 'ctAddlWithholding', name: 'Additional Withholding', type: 'currency' }
-        ]
+        ],
+        drivenBy: 'residence'
       }
     },
     "Maryland": {
@@ -197,7 +216,8 @@ const PayrollTaxDashboard = () => {
           { id: 'mdFilingStatus', name: 'Filing Status', type: 'select', options: ['Single', 'Married Filing Jointly', 'Head of Household'] },
           { id: 'mdExemptions', name: 'Exemptions', type: 'number' },
           { id: 'mdAddlWithholding', name: 'Additional Withholding', type: 'currency' }
-        ]
+        ],
+        drivenBy: 'residence'
       }
     }
   };
@@ -377,6 +397,45 @@ const PayrollTaxDashboard = () => {
     }));
   };
 
+  const getApplicableTaxes = (jurisdiction: string) => {
+    const jurisdictionKey = jurisdiction
+      .replace(" (Residence, Primary)", "")
+      .replace(" (Residence)", "")
+      .replace(" (Primary)", "");
+    
+    if (!taxData[jurisdictionKey]) {
+      return [];
+    }
+    
+    if (viewType === 'company') {
+      return Object.keys(taxData[jurisdictionKey]);
+    }
+    
+    if (jurisdiction.includes(" (Residence, Primary)")) {
+      return Object.entries(taxData[jurisdictionKey])
+        .filter(([_, config]) => config.drivenBy === 'residence' || config.drivenBy === 'primary-workplace' || config.drivenBy === 'all')
+        .map(([taxName]) => taxName);
+    }
+    else if (jurisdiction.includes(" (Residence)")) {
+      return Object.entries(taxData[jurisdictionKey])
+        .filter(([_, config]) => config.drivenBy === 'residence' || config.drivenBy === 'all')
+        .map(([taxName]) => taxName);
+    }
+    else if (jurisdiction.includes(" (Primary)")) {
+      return Object.entries(taxData[jurisdictionKey])
+        .filter(([_, config]) => config.drivenBy === 'primary-workplace' || config.drivenBy === 'workplace' || config.drivenBy === 'all')
+        .map(([taxName]) => taxName);
+    }
+    else if (jurisdiction === 'Federal') {
+      return Object.keys(taxData[jurisdictionKey]);
+    }
+    else {
+      return Object.entries(taxData[jurisdictionKey])
+        .filter(([_, config]) => config.drivenBy === 'workplace' || config.drivenBy === 'all')
+        .map(([taxName]) => taxName);
+    }
+  };
+
   return (
     <div className="max-w-6xl mx-auto p-6 bg-white rounded-lg shadow-lg">
       <h1 className="text-2xl font-bold mb-6">Payroll Tax Dashboard</h1>
@@ -541,7 +600,9 @@ const PayrollTaxDashboard = () => {
                 );
               }
               
-              return Object.keys(taxData[jurisdictionKey])
+              const applicableTaxes = getApplicableTaxes(activeJurisdiction);
+              
+              return applicableTaxes
                 .filter(taxName => !exemptedTaxes[jurisdictionKey].includes(taxName))
                 .map(taxName => (
                   <div key={taxName} className="border border-gray-200 rounded-lg overflow-hidden">
@@ -551,6 +612,9 @@ const PayrollTaxDashboard = () => {
                         onClick={() => toggleTaxExpansion(taxName)}
                       >
                         {taxName}
+                        <span className="ml-2 text-xs text-gray-500">
+                          ({taxData[jurisdictionKey][taxName].drivenBy})
+                        </span>
                       </h3>
                       <div className="flex items-center">
                         <button
@@ -615,14 +679,19 @@ const PayrollTaxDashboard = () => {
               return null;
             }
             
-            if (exemptedTaxes[jurisdictionKey] && exemptedTaxes[jurisdictionKey].length > 0) {
+            const applicableTaxes = getApplicableTaxes(activeJurisdiction);
+            const exemptedApplicableTaxes = exemptedTaxes[jurisdictionKey].filter(taxName => 
+              applicableTaxes.includes(taxName)
+            );
+            
+            if (exemptedApplicableTaxes.length > 0) {
               return (
                 <div className="mt-8 border-t pt-6">
                   <h3 className="text-lg font-semibold mb-4 text-gray-600">
                     Exempted Taxes
                   </h3>
                   <div className="space-y-4">
-                    {exemptedTaxes[jurisdictionKey].map(taxName => (
+                    {exemptedApplicableTaxes.map(taxName => (
                       <div key={taxName} className="border border-gray-200 rounded-lg overflow-hidden bg-gray-50">
                         <div className="px-4 py-3 flex justify-between items-center">
                           <h3 
@@ -630,6 +699,9 @@ const PayrollTaxDashboard = () => {
                             onClick={() => toggleTaxExpansion(taxName)}
                           >
                             {taxName}
+                            <span className="ml-2 text-xs text-gray-500">
+                              ({taxData[jurisdictionKey][taxName].drivenBy})
+                            </span>
                           </h3>
                           <div className="flex items-center">
                             <button
