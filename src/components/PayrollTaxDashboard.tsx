@@ -60,7 +60,7 @@ const PayrollTaxDashboard = () => {
           { id: 'w4Deductions', name: 'Deductions', type: 'currency' },
           { id: 'w4ExtraWithholding', name: 'Extra Withholding', type: 'currency' }
         ],
-        drivenBy: 'all'
+        drivenBy: 'residence'
       },
       "FICA - Social Security": {
         parameters: [
@@ -111,7 +111,7 @@ const PayrollTaxDashboard = () => {
           { id: 'caSUIRate', name: 'Rate', type: 'percentage', value: '3.4%', readonly: true },
           { id: 'caSUICap', name: 'Annual Cap', type: 'currency', value: '$7,000', readonly: true }
         ],
-        drivenBy: 'workplace'
+        drivenBy: 'primary-workplace'
       }
     },
     "New York": {
@@ -171,7 +171,7 @@ const PayrollTaxDashboard = () => {
           { id: 'njUIRate', name: 'Rate', type: 'percentage', value: '0.3825%', readonly: true },
           { id: 'njUICap', name: 'Annual Cap', type: 'currency', value: '$41,100', readonly: true }
         ],
-        drivenBy: 'workplace'
+        drivenBy: 'primary-workplace'
       },
       "NJ Disability Insurance": {
         parameters: [
