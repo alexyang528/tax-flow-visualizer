@@ -49,7 +49,6 @@ interface ExpandedState {
 }
 
 const PayrollTaxDashboard = () => {
-  // Sample data structure for jurisdictions, taxes, and parameters
   const taxData: TaxData = {
     "Federal": {
       "Federal Income Tax": {
@@ -203,7 +202,6 @@ const PayrollTaxDashboard = () => {
     }
   };
 
-  // Workplaces for filtering
   const workplaces = [
     { id: 'all', name: 'All Workplaces' },
     { id: 'hq', name: 'Headquarters - New York' },
@@ -211,7 +209,6 @@ const PayrollTaxDashboard = () => {
     { id: 'remote-dc', name: 'Remote Office - DC' }
   ];
 
-  // Sample employee data
   const employees = [
     { id: 'emp1', name: 'John Smith', workplaces: ['hq', 'remote-dc'], primaryWorkplace: 'hq', residence: { state: 'New Jersey', address: '123 Maple St, Jersey City, NJ 07302' } },
     { id: 'emp2', name: 'Sarah Johnson', workplaces: ['branch-ca'], primaryWorkplace: 'branch-ca', residence: { state: 'California', address: '456 Palm Ave, San Francisco, CA 94107' } },
@@ -221,7 +218,6 @@ const PayrollTaxDashboard = () => {
     { id: 'emp6', name: 'Lisa Garcia', workplaces: ['branch-ca', 'remote-dc'], primaryWorkplace: 'branch-ca', residence: { state: 'Maryland', address: '303 Pine Ln, Bethesda, MD 20814' } }
   ];
 
-  // State variables for managing the UI
   const [activeJurisdiction, setActiveJurisdiction] = useState<string>('Federal');
   const [selectedWorkplace, setSelectedWorkplace] = useState<string>('all');
   const [selectedEmployee, setSelectedEmployee] = useState<string>('');
@@ -237,8 +233,7 @@ const PayrollTaxDashboard = () => {
     "Connecticut": [],
     "Maryland": []
   });
-  
-  // Handle mode toggle
+
   const handleViewTypeToggle = (type: 'company' | 'employee'): void => {
     setViewType(type);
     setSelectedWorkplace('all');
@@ -247,14 +242,12 @@ const PayrollTaxDashboard = () => {
       setSelectedEmployee('');
     }
   };
-  
-  // Reset workplace selection when employee changes
+
   const handleEmployeeChange = (employeeId: string): void => {
     setSelectedEmployee(employeeId);
     setSelectedWorkplace('all');
   };
-  
-  // Toggle tax exemption status
+
   const toggleTaxExemption = (jurisdiction: string, taxName: string): void => {
     setExemptedTaxes(prev => {
       const updatedExemptions = { ...prev };
@@ -269,12 +262,9 @@ const PayrollTaxDashboard = () => {
     });
   };
 
-  // Get filtered jurisdictions and map residence jurisdictions to actual tax data keys
   const getFilteredJurisdictions = () => {
-    // Entire Company view with workplace filter
     if (viewType === 'company') {
       if (selectedWorkplace === 'all') {
-        // Ensure Federal is first
         const jurisdictions = Object.keys(taxData);
         return ['Federal', ...jurisdictions.filter(j => j !== 'Federal')];
       }
@@ -291,7 +281,6 @@ const PayrollTaxDashboard = () => {
       }
     }
     
-    // By Employee view
     else {
       const employee = employees.find(emp => emp.id === selectedEmployee);
       if (!employee) return [];
@@ -306,67 +295,70 @@ const PayrollTaxDashboard = () => {
         });
       }
       
-      // Create separate arrays for different jurisdiction types to control order
       let federalJurisdiction: string[] = ['Federal'];
       let residenceJurisdiction: string[] = [];
       let primaryJurisdictions: string[] = [];
       let otherJurisdictions: string[] = [];
       
-      // Add residence jurisdiction if it exists in tax data
-      if (employee.residence && taxData[employee.residence.state]) {
-        residenceJurisdiction.push(`${employee.residence.state} (Residence)`);
-      }
+      const residenceState = employee.residence?.state;
       
-      // Keep track of state jurisdictions already added to avoid duplicates
-      const stateJurisdictions = new Set<string>();
-      
-      // First, handle primary workplace to identify primary jurisdictions
+      let primaryWorkplaceState: string | null = null;
       const primaryWorkplace = employee.primaryWorkplace;
+      
       if (applicableWorkplaces.includes(primaryWorkplace)) {
         switch (primaryWorkplace) {
           case 'hq':
-            primaryJurisdictions.push('New York (Primary)');
-            stateJurisdictions.add('New York');
+            primaryWorkplaceState = 'New York';
             break;
           case 'branch-ca':
-            primaryJurisdictions.push('California (Primary)');
-            stateJurisdictions.add('California');
+            primaryWorkplaceState = 'California';
             break;
           case 'remote-dc':
-            primaryJurisdictions.push('District of Columbia (Primary)');
-            stateJurisdictions.add('District of Columbia');
+            primaryWorkplaceState = 'District of Columbia';
             break;
         }
       }
       
-      // Then handle other workplaces
+      const stateJurisdictions = new Set<string>();
+      
+      if (residenceState && primaryWorkplaceState && residenceState === primaryWorkplaceState && taxData[residenceState]) {
+        residenceJurisdiction.push(`${residenceState} (Residence, Primary)`);
+        stateJurisdictions.add(residenceState);
+      } else {
+        if (residenceState && taxData[residenceState]) {
+          residenceJurisdiction.push(`${residenceState} (Residence)`);
+          stateJurisdictions.add(residenceState);
+        }
+        
+        if (primaryWorkplaceState && !stateJurisdictions.has(primaryWorkplaceState) && applicableWorkplaces.includes(primaryWorkplace)) {
+          primaryJurisdictions.push(`${primaryWorkplaceState} (Primary)`);
+          stateJurisdictions.add(primaryWorkplaceState);
+        }
+      }
+      
       applicableWorkplaces.forEach(wp => {
-        // Skip primary workplace, already handled
         if (wp === primaryWorkplace) return;
+        
+        let workplaceState: string | null = null;
         
         switch (wp) {
           case 'hq':
-            if (!stateJurisdictions.has('New York')) {
-              otherJurisdictions.push('New York');
-              stateJurisdictions.add('New York');
-            }
+            workplaceState = 'New York';
             break;
           case 'branch-ca':
-            if (!stateJurisdictions.has('California')) {
-              otherJurisdictions.push('California');
-              stateJurisdictions.add('California');
-            }
+            workplaceState = 'California';
             break;
           case 'remote-dc':
-            if (!stateJurisdictions.has('District of Columbia')) {
-              otherJurisdictions.push('District of Columbia');
-              stateJurisdictions.add('District of Columbia');
-            }
+            workplaceState = 'District of Columbia';
             break;
+        }
+        
+        if (workplaceState && !stateJurisdictions.has(workplaceState)) {
+          otherJurisdictions.push(workplaceState);
+          stateJurisdictions.add(workplaceState);
         }
       });
       
-      // Combine all jurisdictions in the desired order
       return [
         ...federalJurisdiction,
         ...residenceJurisdiction,
@@ -378,7 +370,6 @@ const PayrollTaxDashboard = () => {
 
   const filteredJurisdictions = getFilteredJurisdictions();
 
-  // Toggle tax section expansion
   const toggleTaxExpansion = (taxName: string): void => {
     setExpanded(prev => ({
       ...prev,
@@ -390,7 +381,6 @@ const PayrollTaxDashboard = () => {
     <div className="max-w-6xl mx-auto p-6 bg-white rounded-lg shadow-lg">
       <h1 className="text-2xl font-bold mb-6">Payroll Tax Dashboard</h1>
       
-      {/* View Type Toggle */}
       <div className="mb-6">
         <div className="flex space-x-2 mb-4">
           <button
@@ -415,7 +405,6 @@ const PayrollTaxDashboard = () => {
           </button>
         </div>
         
-        {/* Show Employee Details when in Employee View */}
         {viewType === 'employee' && selectedEmployee && (
           <div className="bg-blue-50 p-4 rounded-lg mb-4">
             <h3 className="font-medium text-blue-800">Employee Information</h3>
@@ -458,7 +447,6 @@ const PayrollTaxDashboard = () => {
         )}
         
         <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-          {/* Employee Filter - Only visible in By Employee view */}
           {viewType === 'employee' && (
             <div>
               <label className="block text-sm font-medium text-gray-700 mb-2">Select Employee:</label>
@@ -476,7 +464,6 @@ const PayrollTaxDashboard = () => {
             </div>
           )}
           
-          {/* Workplace Filter */}
           <div>
             <label className="block text-sm font-medium text-gray-700 mb-2">
               {viewType === 'company' ? 'Filter by Workplace:' : 'Filter by Employee Workplace:'}
@@ -488,7 +475,6 @@ const PayrollTaxDashboard = () => {
             >
               <option value="all">All Workplaces</option>
               {viewType === 'employee' && selectedEmployee ? 
-                // In By Employee view, only show workplaces the employee is assigned to
                 employees.find(emp => emp.id === selectedEmployee)?.workplaces.map(wpId => {
                   const workplace = workplaces.find(wp => wp.id === wpId);
                   return workplace ? (
@@ -496,7 +482,6 @@ const PayrollTaxDashboard = () => {
                   ) : null;
                 })
                 :
-                // In Entire Company view or if no employee selected, show all workplaces
                 workplaces.filter(wp => wp.id !== 'all').map(workplace => (
                   <option key={workplace.id} value={workplace.id}>{workplace.name}</option>
                 ))
@@ -506,7 +491,6 @@ const PayrollTaxDashboard = () => {
         </div>
       </div>
       
-      {/* Jurisdiction Tabs */}
       <div className="mb-4 border-b border-gray-200">
         <div className="flex flex-wrap -mb-px">
           {filteredJurisdictions.map(jurisdiction => (
@@ -525,23 +509,21 @@ const PayrollTaxDashboard = () => {
         </div>
       </div>
       
-      {/* Tax Content */}
       {(filteredJurisdictions.includes(activeJurisdiction) || 
         activeJurisdiction.includes(" (Residence)") || 
-        activeJurisdiction.includes(" (Primary)")) && (
+        activeJurisdiction.includes(" (Primary)") ||
+        activeJurisdiction.includes(" (Residence, Primary)")) && (
         <div>
-          {/* Active Taxes */}
           <div className="space-y-6 mb-8">
             <h3 className="text-lg font-semibold">
               Active Taxes
             </h3>
             {(() => {
-              // Get the actual jurisdiction key for the tax data
               const jurisdictionKey = activeJurisdiction
                 .replace(" (Residence)", "")
-                .replace(" (Primary)", "");
+                .replace(" (Primary)", "")
+                .replace(" (Residence, Primary)", "");
               
-              // Check if the jurisdiction exists in tax data
               if (!taxData[jurisdictionKey]) {
                 return (
                   <div className="bg-yellow-50 border-l-4 border-yellow-400 p-4">
@@ -623,11 +605,11 @@ const PayrollTaxDashboard = () => {
             })()}
           </div>
 
-          {/* Exempted Taxes Section */}
           {(() => {
             const jurisdictionKey = activeJurisdiction
               .replace(" (Residence)", "")
-              .replace(" (Primary)", "");
+              .replace(" (Primary)", "")
+              .replace(" (Residence, Primary)", "");
             
             if (!taxData[jurisdictionKey]) {
               return null;
@@ -708,7 +690,6 @@ const PayrollTaxDashboard = () => {
         </div>
       )}
       
-      {/* Alert for empty jurisdiction or missing employee selection */}
       {!filteredJurisdictions.includes(activeJurisdiction) && 
        !activeJurisdiction.includes(" (Residence)") &&
        !activeJurisdiction.includes(" (Primary)") && (
@@ -728,7 +709,6 @@ const PayrollTaxDashboard = () => {
         </div>
       )}
       
-      {/* By Employee view with no employee selected */}
       {viewType === 'employee' && !selectedEmployee && (
         <div className="bg-blue-50 border-l-4 border-blue-400 p-4">
           <div className="flex">
