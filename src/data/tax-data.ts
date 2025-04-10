@@ -11,7 +11,7 @@ export const taxData: TaxData = {
         { id: 'w4Deductions', name: 'Deductions', type: 'currency' },
         { id: 'w4ExtraWithholding', name: 'Extra Withholding', type: 'currency' }
       ],
-      drivenBy: 'residence'
+      drivenBy: 'residence, workplace'
     },
     "FICA - Social Security": {
       parameters: [
@@ -19,7 +19,7 @@ export const taxData: TaxData = {
         { id: 'ficaSSRate', name: 'Current Rate', type: 'percentage', value: '6.2%', readonly: true },
         { id: 'ficaSSCap', name: 'Annual Cap', type: 'currency', value: '$160,200', readonly: true }
       ],
-      drivenBy: 'residence, workplace, primary workplace'
+      drivenBy: 'workplace'
     },
     "FICA - Medicare": {
       parameters: [
@@ -28,7 +28,7 @@ export const taxData: TaxData = {
         { id: 'ficaMedAddlRate', name: 'Additional Rate', type: 'percentage', value: '0.9%', readonly: true },
         { id: 'ficaMedAddlThreshold', name: 'Additional Rate Threshold', type: 'currency', value: '$200,000', readonly: true }
       ],
-      drivenBy: 'residence, workplace, primary workplace'
+      drivenBy: 'workplace'
     },
     "FUTA": {
       parameters: [
@@ -46,7 +46,7 @@ export const taxData: TaxData = {
         { id: 'caAllowances', name: 'Allowances', type: 'number' },
         { id: 'caAddlWithholding', name: 'Additional Withholding', type: 'currency' }
       ],
-      drivenBy: 'residence'
+      drivenBy: 'residence, workplace'
     },
     "CA SDI": {
       parameters: [
@@ -54,7 +54,7 @@ export const taxData: TaxData = {
         { id: 'caSDIRate', name: 'Rate', type: 'percentage', value: '1.1%', readonly: true },
         { id: 'caSDICap', name: 'Annual Cap', type: 'currency', value: '$153,164', readonly: true }
       ],
-      drivenBy: 'residence'
+      drivenBy: 'primary workplace'
     },
     "CA SUI": {
       parameters: [
@@ -72,14 +72,14 @@ export const taxData: TaxData = {
         { id: 'nyAllowances', name: 'Allowances', type: 'number' },
         { id: 'nyAddlWithholding', name: 'Additional Withholding', type: 'currency' }
       ],
-      drivenBy: 'residence'
+      drivenBy: 'residence, workplace'
     },
     "NY SDI": {
       parameters: [
         { id: 'nySDIRate', name: 'Weekly Rate', type: 'currency', value: '$0.50', readonly: true },
         { id: 'nySDICap', name: 'Annual Cap', type: 'currency', value: '$26.00', readonly: true }
       ],
-      drivenBy: 'workplace'
+      drivenBy: 'primary workplace'
     },
     "NY Paid Family Leave": {
       parameters: [
@@ -87,7 +87,7 @@ export const taxData: TaxData = {
         { id: 'nyPFLRate', name: 'Rate', type: 'percentage', value: '0.455%', readonly: true },
         { id: 'nyPFLCap', name: 'Annual Cap', type: 'currency', value: '$82,654', readonly: true }
       ],
-      drivenBy: 'workplace'
+      drivenBy: 'primary workplace'
     }
   },
   "District of Columbia": {
@@ -97,14 +97,14 @@ export const taxData: TaxData = {
         { id: 'dcAllowances', name: 'Allowances', type: 'number' },
         { id: 'dcAddlWithholding', name: 'Additional Withholding', type: 'currency' }
       ],
-      drivenBy: 'residence'
+      drivenBy: 'residence, workplace'
     },
     "DC Paid Family Leave": {
       parameters: [
         { id: 'dcPFLWage', name: 'YTD PFL Wages', type: 'currency', readonly: true },
         { id: 'dcPFLRate', name: 'Rate', type: 'percentage', value: '0.62%', readonly: true }
       ],
-      drivenBy: 'workplace'
+      drivenBy: 'primary workplace'
     }
   },
   "New Jersey": {
@@ -114,7 +114,7 @@ export const taxData: TaxData = {
         { id: 'njAllowances', name: 'Allowances', type: 'number' },
         { id: 'njAddlWithholding', name: 'Additional Withholding', type: 'currency' }
       ],
-      drivenBy: 'residence'
+      drivenBy: 'residence, workplace'
     },
     "NJ Unemployment Insurance": {
       parameters: [
@@ -130,7 +130,7 @@ export const taxData: TaxData = {
         { id: 'njDIRate', name: 'Rate', type: 'percentage', value: '0.16%', readonly: true },
         { id: 'njDICap', name: 'Annual Cap', type: 'currency', value: '$41,100', readonly: true }
       ],
-      drivenBy: 'residence'
+      drivenBy: 'primary workplace'
     },
     "NJ Family Leave Insurance": {
       parameters: [
@@ -138,7 +138,7 @@ export const taxData: TaxData = {
         { id: 'njFLIRate', name: 'Rate', type: 'percentage', value: '0.14%', readonly: true },
         { id: 'njFLICap', name: 'Annual Cap', type: 'currency', value: '$41,100', readonly: true }
       ],
-      drivenBy: 'residence'
+      drivenBy: 'primary workplace'
     }
   },
   "Virginia": {
@@ -148,7 +148,7 @@ export const taxData: TaxData = {
         { id: 'vaExemptions', name: 'Exemptions', type: 'number' },
         { id: 'vaAddlWithholding', name: 'Additional Withholding', type: 'currency' }
       ],
-      drivenBy: 'residence'
+      drivenBy: 'residence, workplace'
     }
   },
   "Connecticut": {
@@ -158,7 +158,7 @@ export const taxData: TaxData = {
         { id: 'ctWithholdingCode', name: 'Withholding Code', type: 'select', options: ['A', 'B', 'C', 'D', 'E', 'F'] },
         { id: 'ctAddlWithholding', name: 'Additional Withholding', type: 'currency' }
       ],
-      drivenBy: 'residence'
+      drivenBy: 'residence, workplace'
     }
   },
   "Maryland": {
@@ -168,7 +168,7 @@ export const taxData: TaxData = {
         { id: 'mdExemptions', name: 'Exemptions', type: 'number' },
         { id: 'mdAddlWithholding', name: 'Additional Withholding', type: 'currency' }
       ],
-      drivenBy: 'residence'
+      drivenBy: 'residence, workplace'
     }
   }
 };
