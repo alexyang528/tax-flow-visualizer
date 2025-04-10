@@ -79,8 +79,8 @@ const PayrollTaxDashboard = () => {
 
   const isValidJurisdiction = filteredJurisdictions.includes(activeJurisdiction) || 
                               activeJurisdiction.includes(" (Residence)") || 
-                              activeJurisdiction.includes(" (Primary)") ||
-                              activeJurisdiction.includes(" (Residence, Primary)");
+                              activeJurisdiction.includes(" (Primary Workplace)") ||
+                              activeJurisdiction.includes(" (Residence, Primary Workplace)");
 
   return (
     <div className="max-w-6xl mx-auto p-6 bg-white rounded-lg shadow-lg">

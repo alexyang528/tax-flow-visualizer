@@ -67,7 +67,7 @@ export const getFilteredJurisdictions = (
     const stateJurisdictions = new Set<string>();
     
     if (residenceState && primaryWorkplaceState && residenceState === primaryWorkplaceState && taxData[residenceState]) {
-      residenceJurisdiction.push(`${residenceState} (Residence, Primary)`);
+      residenceJurisdiction.push(`${residenceState} (Residence, Primary Workplace)`);
       stateJurisdictions.add(residenceState);
     } else {
       if (residenceState && taxData[residenceState]) {
@@ -76,7 +76,7 @@ export const getFilteredJurisdictions = (
       }
       
       if (primaryWorkplaceState && !stateJurisdictions.has(primaryWorkplaceState) && applicableWorkplaces.includes(primaryWorkplace)) {
-        primaryJurisdictions.push(`${primaryWorkplaceState} (Primary)`);
+        primaryJurisdictions.push(`${primaryWorkplaceState} (Primary Workplace)`);
         stateJurisdictions.add(primaryWorkplaceState);
       }
     }
@@ -118,9 +118,9 @@ export const getApplicableTaxes = (
   viewType: ViewType
 ) => {
   const jurisdictionKey = jurisdiction
-    .replace(" (Residence, Primary)", "")
+    .replace(" (Residence, Primary Workplace)", "")
     .replace(" (Residence)", "")
-    .replace(" (Primary)", "");
+    .replace(" (Primary Workplace)", "");
   
   if (!taxData[jurisdictionKey]) {
     return [];
@@ -130,7 +130,7 @@ export const getApplicableTaxes = (
     return Object.keys(taxData[jurisdictionKey]);
   }
   
-  if (jurisdiction.includes(" (Residence, Primary)")) {
+  if (jurisdiction.includes(" (Residence, Primary Workplace)")) {
     return Object.entries(taxData[jurisdictionKey])
       .filter(([_, config]) => {
         const drivenByFactors = config.drivenBy.split(', ');
@@ -148,7 +148,7 @@ export const getApplicableTaxes = (
       })
       .map(([taxName]) => taxName);
   }
-  else if (jurisdiction.includes(" (Primary)")) {
+  else if (jurisdiction.includes(" (Primary Workplace)")) {
     return Object.entries(taxData[jurisdictionKey])
       .filter(([_, config]) => {
         const drivenByFactors = config.drivenBy.split(', ');

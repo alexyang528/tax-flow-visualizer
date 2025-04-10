@@ -12,6 +12,14 @@ const JurisdictionTabs = ({
   activeJurisdiction, 
   onJurisdictionChange 
 }: JurisdictionTabsProps) => {
+  // Function to format jurisdiction label
+  const formatJurisdictionLabel = (jurisdiction: string): string => {
+    return jurisdiction
+      .replace(" (Primary)", " (Primary Workplace)")
+      .replace(" (Residence, Primary)", " (Residence, Primary Workplace)")
+      .replace(" (Primary Workplace, Residence)", " (Residence, Primary Workplace)");
+  };
+
   return (
     <div className="mb-4 border-b border-gray-200">
       <div className="flex flex-wrap -mb-px">
@@ -25,7 +33,7 @@ const JurisdictionTabs = ({
             }`}
             onClick={() => onJurisdictionChange(jurisdiction)}
           >
-            {jurisdiction}
+            {formatJurisdictionLabel(jurisdiction)}
           </button>
         ))}
       </div>
