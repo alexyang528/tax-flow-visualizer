@@ -12,7 +12,7 @@ interface TaxParameter {
 
 interface TaxConfig {
   parameters: TaxParameter[];
-  drivenBy: 'workplace' | 'residence' | 'primary-workplace' | 'all';
+  drivenBy: 'workplace' | 'residence' | 'primary-workplace' | 'residence,workplace' | 'workplace,primary-workplace' | 'residence,primary-workplace' | 'residence,workplace,primary-workplace';
 }
 
 interface JurisdictionTaxes {
@@ -68,7 +68,7 @@ const PayrollTaxDashboard = () => {
           { id: 'ficaSSRate', name: 'Current Rate', type: 'percentage', value: '6.2%', readonly: true },
           { id: 'ficaSSCap', name: 'Annual Cap', type: 'currency', value: '$160,200', readonly: true }
         ],
-        drivenBy: 'all'
+        drivenBy: 'residence,workplace,primary-workplace'
       },
       "FICA - Medicare": {
         parameters: [
@@ -77,7 +77,7 @@ const PayrollTaxDashboard = () => {
           { id: 'ficaMedAddlRate', name: 'Additional Rate', type: 'percentage', value: '0.9%', readonly: true },
           { id: 'ficaMedAddlThreshold', name: 'Additional Rate Threshold', type: 'currency', value: '$200,000', readonly: true }
         ],
-        drivenBy: 'all'
+        drivenBy: 'residence,workplace,primary-workplace'
       },
       "FUTA": {
         parameters: [
@@ -413,17 +413,29 @@ const PayrollTaxDashboard = () => {
     
     if (jurisdiction.includes(" (Residence, Primary)")) {
       return Object.entries(taxData[jurisdictionKey])
-        .filter(([_, config]) => config.drivenBy === 'residence' || config.drivenBy === 'primary-workplace' || config.drivenBy === 'all')
+        .filter(([_, config]) => {
+          const drivenByFactors = config.drivenBy.split(',');
+          return drivenByFactors.includes('residence') || 
+                 drivenByFactors.includes('primary-workplace') ||
+                 drivenByFactors.length === 3;
+        })
         .map(([taxName]) => taxName);
     }
     else if (jurisdiction.includes(" (Residence)")) {
       return Object.entries(taxData[jurisdictionKey])
-        .filter(([_, config]) => config.drivenBy === 'residence' || config.drivenBy === 'all')
+        .filter(([_, config]) => {
+          const drivenByFactors = config.drivenBy.split(',');
+          return drivenByFactors.includes('residence');
+        })
         .map(([taxName]) => taxName);
     }
     else if (jurisdiction.includes(" (Primary)")) {
       return Object.entries(taxData[jurisdictionKey])
-        .filter(([_, config]) => config.drivenBy === 'primary-workplace' || config.drivenBy === 'workplace' || config.drivenBy === 'all')
+        .filter(([_, config]) => {
+          const drivenByFactors = config.drivenBy.split(',');
+          return drivenByFactors.includes('primary-workplace') || 
+                 drivenByFactors.includes('workplace');
+        })
         .map(([taxName]) => taxName);
     }
     else if (jurisdiction === 'Federal') {
@@ -431,7 +443,10 @@ const PayrollTaxDashboard = () => {
     }
     else {
       return Object.entries(taxData[jurisdictionKey])
-        .filter(([_, config]) => config.drivenBy === 'workplace' || config.drivenBy === 'all')
+        .filter(([_, config]) => {
+          const drivenByFactors = config.drivenBy.split(',');
+          return drivenByFactors.includes('workplace');
+        })
         .map(([taxName]) => taxName);
     }
   };
