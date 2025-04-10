@@ -19,7 +19,7 @@ export const taxData: TaxData = {
         { id: 'ficaSSRate', name: 'Current Rate', type: 'percentage', value: '6.2%', readonly: true },
         { id: 'ficaSSCap', name: 'Annual Cap', type: 'currency', value: '$160,200', readonly: true }
       ],
-      drivenBy: 'residence, workplace, primary-workplace'
+      drivenBy: 'residence, workplace, primary workplace'
     },
     "FICA - Medicare": {
       parameters: [
@@ -28,7 +28,7 @@ export const taxData: TaxData = {
         { id: 'ficaMedAddlRate', name: 'Additional Rate', type: 'percentage', value: '0.9%', readonly: true },
         { id: 'ficaMedAddlThreshold', name: 'Additional Rate Threshold', type: 'currency', value: '$200,000', readonly: true }
       ],
-      drivenBy: 'residence, workplace, primary-workplace'
+      drivenBy: 'residence, workplace, primary workplace'
     },
     "FUTA": {
       parameters: [
@@ -62,7 +62,7 @@ export const taxData: TaxData = {
         { id: 'caSUIRate', name: 'Rate', type: 'percentage', value: '3.4%', readonly: true },
         { id: 'caSUICap', name: 'Annual Cap', type: 'currency', value: '$7,000', readonly: true }
       ],
-      drivenBy: 'primary-workplace'
+      drivenBy: 'primary workplace'
     }
   },
   "New York": {
@@ -122,7 +122,7 @@ export const taxData: TaxData = {
         { id: 'njUIRate', name: 'Rate', type: 'percentage', value: '0.3825%', readonly: true },
         { id: 'njUICap', name: 'Annual Cap', type: 'currency', value: '$41,100', readonly: true }
       ],
-      drivenBy: 'primary-workplace'
+      drivenBy: 'primary workplace'
     },
     "NJ Disability Insurance": {
       parameters: [

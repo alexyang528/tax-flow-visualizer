@@ -10,7 +10,7 @@ export interface TaxParameter {
 
 export interface TaxConfig {
   parameters: TaxParameter[];
-  drivenBy: 'workplace' | 'residence' | 'primary-workplace' | 'residence, workplace' | 'workplace, primary-workplace' | 'residence, primary-workplace' | 'residence, workplace, primary-workplace';
+  drivenBy: 'workplace' | 'residence' | 'primary workplace' | 'residence, workplace' | 'workplace, primary workplace' | 'residence, primary workplace' | 'residence, workplace, primary workplace';
 }
 
 export interface JurisdictionTaxes {

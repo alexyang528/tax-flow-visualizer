@@ -135,7 +135,7 @@ export const getApplicableTaxes = (
       .filter(([_, config]) => {
         const drivenByFactors = config.drivenBy.split(', ');
         return drivenByFactors.includes('residence') || 
-               drivenByFactors.includes('primary-workplace') ||
+               drivenByFactors.includes('primary workplace') ||
                drivenByFactors.length === 3;
       })
       .map(([taxName]) => taxName);
@@ -152,7 +152,7 @@ export const getApplicableTaxes = (
     return Object.entries(taxData[jurisdictionKey])
       .filter(([_, config]) => {
         const drivenByFactors = config.drivenBy.split(', ');
-        return drivenByFactors.includes('primary-workplace') || 
+        return drivenByFactors.includes('primary workplace') || 
                drivenByFactors.includes('workplace');
       })
       .map(([taxName]) => taxName);
