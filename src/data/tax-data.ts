@@ -10,7 +10,7 @@ export const taxData: TaxData = {
         { id: 'w4Deductions', name: 'Deductions', type: 'currency' },
         { id: 'w4ExtraWithholding', name: 'Extra Withholding', type: 'currency' }
       ],
-      drivenBy: 'residence, workplace'
+      drivenBy: null
     },
     "FICA - Social Security": {
       parameters: [
@@ -18,7 +18,7 @@ export const taxData: TaxData = {
         { id: 'ficaSSRate', name: 'Current Rate', type: 'percentage', value: '6.2%', readonly: true },
         { id: 'ficaSSCap', name: 'Annual Cap', type: 'currency', value: '$160,200', readonly: true }
       ],
-      drivenBy: 'workplace'
+      drivenBy: null
     },
     "FICA - Medicare": {
       parameters: [
@@ -27,7 +27,7 @@ export const taxData: TaxData = {
         { id: 'ficaMedAddlRate', name: 'Additional Rate', type: 'percentage', value: '0.9%', readonly: true },
         { id: 'ficaMedAddlThreshold', name: 'Additional Rate Threshold', type: 'currency', value: '$200,000', readonly: true }
       ],
-      drivenBy: 'workplace'
+      drivenBy: null
     },
     "FUTA": {
       parameters: [
@@ -35,7 +35,7 @@ export const taxData: TaxData = {
         { id: 'futaRate', name: 'Rate', type: 'percentage', value: '0.6%', readonly: true },
         { id: 'futaCap', name: 'Annual Cap', type: 'currency', value: '$7,000', readonly: true }
       ],
-      drivenBy: 'workplace'
+      drivenBy: null
     }
   },
   "California": {

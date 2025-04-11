@@ -1,6 +1,7 @@
 import React from 'react';
-import { TaxConfig } from '@/types/payroll-tax-types';
+import { TaxConfig, Employee } from '@/types/payroll-tax-types';
 import TaxParameter from './TaxParameter';
+import { getActualDrivenBy } from '@/utils/tax-utils';
 
 interface TaxCardProps {
   taxName: string;
@@ -9,6 +10,10 @@ interface TaxCardProps {
   isExpanded: boolean;
   onToggleExpand: () => void;
   onToggleExemption: () => void;
+  viewType: 'company' | 'employee';
+  employee?: Employee;
+  selectedWorkplace?: string;
+  jurisdictionKey: string;
 }
 
 const TaxCard = ({
@@ -17,8 +22,18 @@ const TaxCard = ({
   isExempted,
   isExpanded,
   onToggleExpand,
-  onToggleExemption
+  onToggleExemption,
+  viewType,
+  employee,
+  selectedWorkplace,
+  jurisdictionKey
 }: TaxCardProps) => {
+  const drivenBy = taxConfig.drivenBy === null
+    ? ''
+    : viewType === 'employee' && employee
+      ? getActualDrivenBy(taxConfig, employee, selectedWorkplace || 'all', jurisdictionKey)
+      : taxConfig.drivenBy;
+
   return (
     <div className={`border border-gray-200 rounded-lg overflow-hidden ${isExempted ? 'bg-gray-50' : ''}`}>
       <div className="bg-gray-50 px-4 py-3 flex justify-between items-center">
@@ -27,9 +42,11 @@ const TaxCard = ({
           onClick={onToggleExpand}
         >
           {taxName}
-          <span className="ml-2 text-xs text-gray-500">
-            ({taxConfig.drivenBy})
-          </span>
+          {drivenBy && (
+            <span className="ml-2 text-xs text-gray-500">
+              ({drivenBy})
+            </span>
+          )}
         </h3>
         <div className="flex items-center">
           <button

@@ -1,5 +1,5 @@
 import { taxData } from "@/data/tax-data";
-import { ViewType, Employee } from "@/types/payroll-tax-types";
+import { ViewType, Employee, TaxConfig } from "@/types/payroll-tax-types";
 import { employees, workplaces } from "@/data/employee-data";
 
 export const getFilteredJurisdictions = (
@@ -217,4 +217,92 @@ export const getApplicableTaxes = (
       return false;
     })
     .map(([taxName]) => taxName);
+};
+
+export const getActualDrivenBy = (
+  taxConfig: TaxConfig,
+  employee: Employee,
+  selectedWorkplace: string,
+  jurisdictionKey: string
+): string => {
+  // Federal taxes are always applicable, no need to show driving factors
+  if (jurisdictionKey === 'Federal') {
+    return '';
+  }
+
+  const drivenByFactors = taxConfig.drivenBy.split(', ');
+  const actualFactors: string[] = [];
+
+  // Check if this is driven by residence
+  if (drivenByFactors.includes('residence') && employee.residence.state === jurisdictionKey) {
+    actualFactors.push('residence');
+  }
+
+  // Check if this is driven by workplace
+  if (drivenByFactors.includes('workplace')) {
+    // Get all workplace states for the employee
+    const workplaceStates = new Set<string>();
+    employee.workplaces.forEach(wp => {
+      let workplaceState: string | null = null;
+      switch (wp) {
+        case 'hq':
+          workplaceState = 'New York';
+          break;
+        case 'branch-ca':
+          workplaceState = 'California';
+          break;
+        case 'remote-dc':
+          workplaceState = 'District of Columbia';
+          break;
+      }
+      if (workplaceState) {
+        workplaceStates.add(workplaceState);
+      }
+    });
+
+    // If "All Workplaces" is selected, check if any workplace matches
+    if (selectedWorkplace === 'all') {
+      if (workplaceStates.has(jurisdictionKey)) {
+        actualFactors.push('workplace');
+      }
+    } else {
+      // Otherwise, check the specific selected workplace
+      let selectedWorkplaceState: string | null = null;
+      switch (selectedWorkplace) {
+        case 'hq':
+          selectedWorkplaceState = 'New York';
+          break;
+        case 'branch-ca':
+          selectedWorkplaceState = 'California';
+          break;
+        case 'remote-dc':
+          selectedWorkplaceState = 'District of Columbia';
+          break;
+      }
+      if (selectedWorkplaceState === jurisdictionKey) {
+        actualFactors.push('workplace');
+      }
+    }
+  }
+
+  // Check if this is driven by primary workplace
+  if (drivenByFactors.includes('primary workplace')) {
+    let primaryWorkplaceState: string | null = null;
+    switch (employee.primaryWorkplace) {
+      case 'hq':
+        primaryWorkplaceState = 'New York';
+        break;
+      case 'branch-ca':
+        primaryWorkplaceState = 'California';
+        break;
+      case 'remote-dc':
+        primaryWorkplaceState = 'District of Columbia';
+        break;
+    }
+    if (primaryWorkplaceState === jurisdictionKey) {
+      actualFactors.push('primary workplace');
+    }
+  }
+
+  return actualFactors.join(', ');
 };
