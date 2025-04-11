@@ -1,11 +1,12 @@
 import { taxData } from "@/data/tax-data";
-import { ViewType } from "@/types/payroll-tax-types";
+import { ViewType, Employee } from "@/types/payroll-tax-types";
 import { employees, workplaces } from "@/data/employee-data";
 
 export const getFilteredJurisdictions = (
   viewType: ViewType,
   selectedWorkplace: string,
-  selectedEmployee: string
+  selectedEmployee: string,
+  employee?: Employee
 ) => {
   if (viewType === 'company') {
     if (selectedWorkplace === 'all') {
@@ -26,7 +27,6 @@ export const getFilteredJurisdictions = (
   }
   
   else {
-    const employee = employees.find(emp => emp.id === selectedEmployee);
     if (!employee) return [];
     
     const applicableWorkplaces: string[] = [];
@@ -81,12 +81,31 @@ export const getFilteredJurisdictions = (
     }
     
     // Only include other workplaces if they match the selectedWorkplace filter
-    if (selectedWorkplace === 'all' || selectedWorkplace === primaryWorkplace) {
-      // Primary workplace already included above
-    } else {
-      // Add workplaces that match the filter
+    if (selectedWorkplace === 'all') {
+      // Add all workplaces except primary workplace (which is already included)
+      employee.workplaces
+        .filter(wp => wp !== primaryWorkplace)
+        .forEach(wp => {
+          let workplaceState: string | null = null;
+          switch (wp) {
+            case 'hq':
+              workplaceState = 'New York';
+              break;
+            case 'branch-ca':
+              workplaceState = 'California';
+              break;
+            case 'remote-dc':
+              workplaceState = 'District of Columbia';
+              break;
+          }
+          if (workplaceState && !stateJurisdictions.has(workplaceState)) {
+            otherJurisdictions.push(workplaceState);
+            stateJurisdictions.add(workplaceState);
+          }
+        });
+    } else if (selectedWorkplace !== primaryWorkplace) {
+      // Add single selected workplace if it's not the primary workplace
       let workplaceState: string | null = null;
-      
       switch (selectedWorkplace) {
         case 'hq':
           workplaceState = 'New York';
@@ -116,7 +135,9 @@ export const getFilteredJurisdictions = (
 
 export const getApplicableTaxes = (
   jurisdiction: string,
-  viewType: ViewType
+  viewType: ViewType,
+  selectedEmployee?: string,
+  selectedWorkplace?: string
 ) => {
   const jurisdictionKey = jurisdiction
     .replace(" (Residence, Primary Workplace)", "")
@@ -131,45 +152,62 @@ export const getApplicableTaxes = (
     return Object.keys(taxData[jurisdictionKey]);
   }
   
-  if (jurisdiction.includes(" (Residence, Primary Workplace)")) {
-    // Include all taxes driven by residence, primary workplace, or both
-    return Object.entries(taxData[jurisdictionKey])
-      .filter(([_, config]) => {
-        const drivenByFactors = config.drivenBy.split(', ');
-        return drivenByFactors.includes('residence') || 
-               drivenByFactors.includes('primary workplace') ||
-               drivenByFactors.length === 3;
-      })
-      .map(([taxName]) => taxName);
+  // For employee view, we need to filter based on drivenBy and context
+  const employee = employees.find(emp => emp.id === selectedEmployee);
+  if (!employee) return [];
+  
+  const residenceState = employee.residence?.state;
+  const primaryWorkplace = employee.primaryWorkplace;
+  let primaryWorkplaceState: string | null = null;
+  
+  // Get primary workplace state
+  switch (primaryWorkplace) {
+    case 'hq':
+      primaryWorkplaceState = 'New York';
+      break;
+    case 'branch-ca':
+      primaryWorkplaceState = 'California';
+      break;
+    case 'remote-dc':
+      primaryWorkplaceState = 'District of Columbia';
+      break;
   }
-  else if (jurisdiction.includes(" (Residence)")) {
-    // Include only taxes driven by residence
-    return Object.entries(taxData[jurisdictionKey])
-      .filter(([_, config]) => {
-        const drivenByFactors = config.drivenBy.split(', ');
-        return drivenByFactors.includes('residence');
-      })
-      .map(([taxName]) => taxName);
+  
+  // Get selected workplace state
+  let selectedWorkplaceState: string | null = null;
+  if (selectedWorkplace && selectedWorkplace !== 'all') {
+    switch (selectedWorkplace) {
+      case 'hq':
+        selectedWorkplaceState = 'New York';
+        break;
+      case 'branch-ca':
+        selectedWorkplaceState = 'California';
+        break;
+      case 'remote-dc':
+        selectedWorkplaceState = 'District of Columbia';
+        break;
+    }
   }
-  else if (jurisdiction.includes(" (Primary Workplace)")) {
-    // Include taxes driven by primary workplace
-    return Object.entries(taxData[jurisdictionKey])
-      .filter(([_, config]) => {
-        const drivenByFactors = config.drivenBy.split(', ');
-        return drivenByFactors.includes('primary workplace');
-      })
-      .map(([taxName]) => taxName);
-  }
-  else if (jurisdiction === 'Federal') {
-    return Object.keys(taxData[jurisdictionKey]);
-  }
-  else {
-    // For other workplaces, include only taxes driven by workplace
-    return Object.entries(taxData[jurisdictionKey])
-      .filter(([_, config]) => {
-        const drivenByFactors = config.drivenBy.split(', ');
-        return drivenByFactors.includes('workplace');
-      })
-      .map(([taxName]) => taxName);
-  }
+  
+  return Object.entries(taxData[jurisdictionKey])
+    .filter(([_, config]) => {
+      const drivenByFactors = config.drivenBy.split(', ');
+      
+      // Check if this jurisdiction matches any of the drivenBy factors
+      if (drivenByFactors.includes('residence') && jurisdictionKey === residenceState) {
+        return true;
+      }
+      
+      if (drivenByFactors.includes('primary workplace') && jurisdictionKey === primaryWorkplaceState) {
+        return true;
+      }
+      
+      if (drivenByFactors.includes('workplace') && 
+          (selectedWorkplace === 'all' || jurisdictionKey === selectedWorkplaceState)) {
+        return true;
+      }
+      
+      return false;
+    })
+    .map(([taxName]) => taxName);
 };

@@ -1,4 +1,3 @@
-
 import React from 'react';
 import { TaxConfig } from '@/types/payroll-tax-types';
 import TaxParameter from './TaxParameter';

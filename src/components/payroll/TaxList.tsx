@@ -1,10 +1,10 @@
-
 import React from 'react';
 import { AlertCircle } from 'lucide-react';
 import { TaxData, ExemptedTaxes, ExpandedState, ViewType } from '@/types/payroll-tax-types';
 import TaxCard from './TaxCard';
 import { getApplicableTaxes } from '@/utils/tax-utils';
 import { taxData } from '@/data/tax-data';
+import { employees } from '@/data/employee-data';
 
 interface TaxListProps {
   activeJurisdiction: string;
@@ -13,6 +13,8 @@ interface TaxListProps {
   expanded: ExpandedState;
   onToggleTaxExpansion: (taxName: string) => void;
   onToggleTaxExemption: (jurisdiction: string, taxName: string) => void;
+  selectedEmployee?: string;
+  selectedWorkplace?: string;
 }
 
 const TaxList = ({
@@ -21,7 +23,9 @@ const TaxList = ({
   exemptedTaxes,
   expanded,
   onToggleTaxExpansion,
-  onToggleTaxExemption
+  onToggleTaxExemption,
+  selectedEmployee,
+  selectedWorkplace
 }: TaxListProps) => {
   const jurisdictionKey = activeJurisdiction
     .replace(" (Residence)", "")
@@ -45,11 +49,19 @@ const TaxList = ({
     );
   }
   
-  const applicableTaxes = getApplicableTaxes(activeJurisdiction, viewType);
+  const applicableTaxes = getApplicableTaxes(
+    activeJurisdiction, 
+    viewType,
+    selectedEmployee,
+    selectedWorkplace
+  );
+  
   const activeTaxes = applicableTaxes.filter(taxName => !exemptedTaxes[jurisdictionKey].includes(taxName));
   const exemptedApplicableTaxes = exemptedTaxes[jurisdictionKey].filter(taxName => 
     applicableTaxes.includes(taxName)
   );
+
+  const employee = selectedEmployee ? employees.find(emp => emp.id === selectedEmployee) : undefined;
 
   return (
     <div>
