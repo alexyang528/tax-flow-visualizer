@@ -25,8 +25,8 @@ const TaxList = ({
 }: TaxListProps) => {
   const jurisdictionKey = activeJurisdiction
     .replace(" (Residence)", "")
-    .replace(" (Primary)", "")
-    .replace(" (Residence, Primary)", "");
+    .replace(" (Primary Workplace)", "")
+    .replace(" (Residence, Primary Workplace)", "");
   
   if (!taxData[jurisdictionKey]) {
     return (

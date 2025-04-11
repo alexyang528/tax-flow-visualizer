@@ -1,4 +1,3 @@
-
 import { taxData } from "@/data/tax-data";
 import { ViewType } from "@/types/payroll-tax-types";
 import { employees, workplaces } from "@/data/employee-data";
@@ -50,43 +49,45 @@ export const getFilteredJurisdictions = (
     let primaryWorkplaceState: string | null = null;
     const primaryWorkplace = employee.primaryWorkplace;
     
-    if (applicableWorkplaces.includes(primaryWorkplace)) {
-      switch (primaryWorkplace) {
-        case 'hq':
-          primaryWorkplaceState = 'New York';
-          break;
-        case 'branch-ca':
-          primaryWorkplaceState = 'California';
-          break;
-        case 'remote-dc':
-          primaryWorkplaceState = 'District of Columbia';
-          break;
-      }
+    // Always include the primary workplace state regardless of the selected workplace filter
+    switch (primaryWorkplace) {
+      case 'hq':
+        primaryWorkplaceState = 'New York';
+        break;
+      case 'branch-ca':
+        primaryWorkplaceState = 'California';
+        break;
+      case 'remote-dc':
+        primaryWorkplaceState = 'District of Columbia';
+        break;
     }
     
     const stateJurisdictions = new Set<string>();
     
-    if (residenceState && primaryWorkplaceState && residenceState === primaryWorkplaceState && taxData[residenceState]) {
-      residenceJurisdiction.push(`${residenceState} (Residence, Primary Workplace)`);
-      stateJurisdictions.add(residenceState);
-    } else {
-      if (residenceState && taxData[residenceState]) {
+    // Always include residence state
+    if (residenceState && taxData[residenceState]) {
+      if (residenceState === primaryWorkplaceState) {
+        residenceJurisdiction.push(`${residenceState} (Residence, Primary Workplace)`);
+      } else {
         residenceJurisdiction.push(`${residenceState} (Residence)`);
-        stateJurisdictions.add(residenceState);
       }
-      
-      if (primaryWorkplaceState && !stateJurisdictions.has(primaryWorkplaceState) && applicableWorkplaces.includes(primaryWorkplace)) {
-        primaryJurisdictions.push(`${primaryWorkplaceState} (Primary Workplace)`);
-        stateJurisdictions.add(primaryWorkplaceState);
-      }
+      stateJurisdictions.add(residenceState);
     }
     
-    applicableWorkplaces.forEach(wp => {
-      if (wp === primaryWorkplace) return;
-      
+    // Always include primary workplace state
+    if (primaryWorkplaceState && !stateJurisdictions.has(primaryWorkplaceState)) {
+      primaryJurisdictions.push(`${primaryWorkplaceState} (Primary Workplace)`);
+      stateJurisdictions.add(primaryWorkplaceState);
+    }
+    
+    // Only include other workplaces if they match the selectedWorkplace filter
+    if (selectedWorkplace === 'all' || selectedWorkplace === primaryWorkplace) {
+      // Primary workplace already included above
+    } else {
+      // Add workplaces that match the filter
       let workplaceState: string | null = null;
       
-      switch (wp) {
+      switch (selectedWorkplace) {
         case 'hq':
           workplaceState = 'New York';
           break;
@@ -102,7 +103,7 @@ export const getFilteredJurisdictions = (
         otherJurisdictions.push(workplaceState);
         stateJurisdictions.add(workplaceState);
       }
-    });
+    }
     
     return [
       ...federalJurisdiction,
@@ -131,6 +132,7 @@ export const getApplicableTaxes = (
   }
   
   if (jurisdiction.includes(" (Residence, Primary Workplace)")) {
+    // Include all taxes driven by residence, primary workplace, or both
     return Object.entries(taxData[jurisdictionKey])
       .filter(([_, config]) => {
         const drivenByFactors = config.drivenBy.split(', ');
@@ -141,6 +143,7 @@ export const getApplicableTaxes = (
       .map(([taxName]) => taxName);
   }
   else if (jurisdiction.includes(" (Residence)")) {
+    // Include only taxes driven by residence
     return Object.entries(taxData[jurisdictionKey])
       .filter(([_, config]) => {
         const drivenByFactors = config.drivenBy.split(', ');
@@ -149,11 +152,11 @@ export const getApplicableTaxes = (
       .map(([taxName]) => taxName);
   }
   else if (jurisdiction.includes(" (Primary Workplace)")) {
+    // Include taxes driven by primary workplace
     return Object.entries(taxData[jurisdictionKey])
       .filter(([_, config]) => {
         const drivenByFactors = config.drivenBy.split(', ');
-        return drivenByFactors.includes('primary workplace') || 
-               drivenByFactors.includes('workplace');
+        return drivenByFactors.includes('primary workplace');
       })
       .map(([taxName]) => taxName);
   }
@@ -161,6 +164,7 @@ export const getApplicableTaxes = (
     return Object.keys(taxData[jurisdictionKey]);
   }
   else {
+    // For other workplaces, include only taxes driven by workplace
     return Object.entries(taxData[jurisdictionKey])
       .filter(([_, config]) => {
         const drivenByFactors = config.drivenBy.split(', ');
