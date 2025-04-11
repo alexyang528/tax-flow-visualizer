@@ -78,6 +78,10 @@ const TaxList = ({
             isExpanded={expanded[taxName] || false}
             onToggleExpand={() => onToggleTaxExpansion(taxName)}
             onToggleExemption={() => onToggleTaxExemption(jurisdictionKey, taxName)}
+            viewType={viewType}
+            employee={employee}
+            selectedWorkplace={selectedWorkplace}
+            jurisdictionKey={jurisdictionKey}
           />
         ))}
       </div>
@@ -97,6 +101,10 @@ const TaxList = ({
                 isExpanded={expanded[taxName] || false}
                 onToggleExpand={() => onToggleTaxExpansion(taxName)}
                 onToggleExemption={() => onToggleTaxExemption(jurisdictionKey, taxName)}
+                viewType={viewType}
+                employee={employee}
+                selectedWorkplace={selectedWorkplace}
+                jurisdictionKey={jurisdictionKey}
               />
             ))}
           </div>
