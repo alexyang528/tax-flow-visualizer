@@ -8,19 +8,22 @@ export const getFilteredJurisdictions = (
   selectedEmployee: string,
   employee?: Employee
 ) => {
+  // Always include Federal jurisdiction if there is a workplace
+  const federalJurisdiction: string[] = ['Federal'];
+  
   if (viewType === 'company') {
     if (selectedWorkplace === 'all') {
       const jurisdictions = Object.keys(taxData);
-      return ['Federal', ...jurisdictions.filter(j => j !== 'Federal')];
+      return [...federalJurisdiction, ...jurisdictions.filter(j => j !== 'Federal')];
     }
     
     switch (selectedWorkplace) {
       case 'hq':
-        return ['Federal', 'New York'];
+        return [...federalJurisdiction, 'New York'];
       case 'branch-ca':
-        return ['Federal', 'California'];
+        return [...federalJurisdiction, 'California'];
       case 'remote-dc':
-        return ['Federal', 'District of Columbia'];
+        return [...federalJurisdiction, 'District of Columbia'];
       default:
         return Object.keys(taxData);
     }
@@ -39,7 +42,6 @@ export const getFilteredJurisdictions = (
       });
     }
     
-    let federalJurisdiction: string[] = ['Federal'];
     let residenceJurisdiction: string[] = [];
     let primaryJurisdictions: string[] = [];
     let otherJurisdictions: string[] = [];
@@ -155,6 +157,11 @@ export const getApplicableTaxes = (
   // For employee view, we need to filter based on drivenBy and context
   const employee = employees.find(emp => emp.id === selectedEmployee);
   if (!employee) return [];
+  
+  // Always return all Federal taxes if the jurisdiction is Federal
+  if (jurisdictionKey === 'Federal') {
+    return Object.keys(taxData[jurisdictionKey]);
+  }
   
   const residenceState = employee.residence?.state;
   const primaryWorkplace = employee.primaryWorkplace;
