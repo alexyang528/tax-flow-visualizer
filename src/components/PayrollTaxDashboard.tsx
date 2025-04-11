@@ -39,6 +39,8 @@ const PayrollTaxDashboard = () => {
     } else {
       // Auto-select the first employee when switching to employee view
       setSelectedEmployee(employees[0].id);
+      // Always select Federal tab when switching to employee view
+      setActiveJurisdiction('Federal');
     }
   };
 
