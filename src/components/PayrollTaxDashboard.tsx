@@ -1,9 +1,8 @@
-
-import React, { useState } from 'react';
-import { employees, workplaces } from '@/data/employee-data';
+import React, { useState, useMemo } from 'react';
+import { employees as initialEmployees, workplaces } from '@/data/employee-data';
 import { taxData } from '@/data/tax-data';
 import { getFilteredJurisdictions } from '@/utils/tax-utils';
-import { ExemptedTaxes, ExpandedState, ViewType } from '@/types/payroll-tax-types';
+import { ExemptedTaxes, ExpandedState, ViewType, Employee } from '@/types/payroll-tax-types';
 
 import ViewTypeToggle from './payroll/ViewTypeToggle';
 import EmployeeInfo from './payroll/EmployeeInfo';
@@ -14,6 +13,7 @@ import NoJurisdictionAlert from './payroll/NoJurisdictionAlert';
 import NoEmployeeAlert from './payroll/NoEmployeeAlert';
 
 const PayrollTaxDashboard = () => {
+  const [employees, setEmployees] = useState(initialEmployees);
   const [activeJurisdiction, setActiveJurisdiction] = useState<string>('Federal');
   const [selectedWorkplace, setSelectedWorkplace] = useState<string>('all');
   const [selectedEmployee, setSelectedEmployee] = useState<string>('');
@@ -36,6 +36,9 @@ const PayrollTaxDashboard = () => {
     
     if (type === 'company') {
       setSelectedEmployee('');
+    } else {
+      // Auto-select the first employee when switching to employee view
+      setSelectedEmployee(employees[0].id);
     }
   };
 
@@ -65,17 +68,46 @@ const PayrollTaxDashboard = () => {
     }));
   };
 
-  const filteredJurisdictions = getFilteredJurisdictions(
-    viewType,
-    selectedWorkplace,
-    selectedEmployee
+  const handleEmployeeUpdate = (updatedEmployee: Employee) => {
+    setEmployees(prev => {
+      const newEmployees = prev.map(emp => 
+        emp.id === updatedEmployee.id ? updatedEmployee : emp
+      );
+      
+      // Update the selected employee if it's the one being edited
+      if (selectedEmployee === updatedEmployee.id) {
+        setSelectedEmployee(updatedEmployee.id);
+        
+        // If residence changed, update the active jurisdiction
+        const oldEmployee = prev.find(emp => emp.id === updatedEmployee.id);
+        if (oldEmployee && oldEmployee.residence.state !== updatedEmployee.residence.state) {
+          // Set active jurisdiction to the new residence state
+          setActiveJurisdiction(`${updatedEmployee.residence.state} (Residence)`);
+        }
+      }
+      
+      return newEmployees;
+    });
+  };
+
+  const selectedEmployeeData = useMemo(() => 
+    employees.find(emp => emp.id === selectedEmployee),
+    [employees, selectedEmployee]
+  );
+
+  const filteredJurisdictions = useMemo(() => 
+    getFilteredJurisdictions(
+      viewType,
+      selectedWorkplace,
+      selectedEmployee,
+      selectedEmployeeData
+    ),
+    [viewType, selectedWorkplace, selectedEmployee, selectedEmployeeData]
   );
 
   const handleWorkplaceChange = (workplaceId: string) => {
     setSelectedWorkplace(workplaceId);
   };
-
-  const selectedEmployeeData = employees.find(emp => emp.id === selectedEmployee);
 
   const isValidJurisdiction = filteredJurisdictions.includes(activeJurisdiction) || 
                               activeJurisdiction.includes(" (Residence)") || 
@@ -90,7 +122,11 @@ const PayrollTaxDashboard = () => {
         <ViewTypeToggle viewType={viewType} onToggle={handleViewTypeToggle} />
         
         {viewType === 'employee' && selectedEmployee && (
-          <EmployeeInfo employee={selectedEmployeeData} workplaces={workplaces} />
+          <EmployeeInfo 
+            employee={employees.find(emp => emp.id === selectedEmployee)} 
+            workplaces={workplaces} 
+            onSave={handleEmployeeUpdate}
+          />
         )}
         
         <FilterControls
@@ -118,6 +154,8 @@ const PayrollTaxDashboard = () => {
           expanded={expanded}
           onToggleTaxExpansion={toggleTaxExpansion}
           onToggleTaxExemption={toggleTaxExemption}
+          selectedEmployee={selectedEmployee}
+          selectedWorkplace={selectedWorkplace}
         />
       )}
       

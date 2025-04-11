@@ -1,4 +1,3 @@
-
 import { TaxData } from "@/types/payroll-tax-types";
 
 export const taxData: TaxData = {
@@ -74,10 +73,27 @@ export const taxData: TaxData = {
       ],
       drivenBy: 'residence, workplace'
     },
-    "NY SDI": {
+    "NY City Tax": {
       parameters: [
-        { id: 'nySDIRate', name: 'Weekly Rate', type: 'currency', value: '$0.50', readonly: true },
-        { id: 'nySDICap', name: 'Annual Cap', type: 'currency', value: '$26.00', readonly: true }
+        { id: 'nycFilingStatus', name: 'Filing Status', type: 'select', options: ['Single', 'Married Filing Jointly', 'Head of Household'] },
+        { id: 'nycAllowances', name: 'Allowances', type: 'number' },
+        { id: 'nycAddlWithholding', name: 'Additional Withholding', type: 'currency' }
+      ],
+      drivenBy: 'residence'
+    },
+    "NY State Unemployment Insurance": {
+      parameters: [
+        { id: 'nySUIWage', name: 'YTD SUI Wages', type: 'currency', readonly: true },
+        { id: 'nySUIRate', name: 'Rate', type: 'percentage', value: '2.1%', readonly: true },
+        { id: 'nySUICap', name: 'Annual Cap', type: 'currency', value: '$12,000', readonly: true }
+      ],
+      drivenBy: 'primary workplace'
+    },
+    "NY Reemployment Fund": {
+      parameters: [
+        { id: 'nyREFWage', name: 'YTD REF Wages', type: 'currency', readonly: true },
+        { id: 'nyREFRate', name: 'Rate', type: 'percentage', value: '0.075%', readonly: true },
+        { id: 'nyREFCap', name: 'Annual Cap', type: 'currency', value: '$12,000', readonly: true }
       ],
       drivenBy: 'primary workplace'
     },
@@ -86,6 +102,13 @@ export const taxData: TaxData = {
         { id: 'nyPFLWage', name: 'YTD PFL Wages', type: 'currency', readonly: true },
         { id: 'nyPFLRate', name: 'Rate', type: 'percentage', value: '0.455%', readonly: true },
         { id: 'nyPFLCap', name: 'Annual Cap', type: 'currency', value: '$82,654', readonly: true }
+      ],
+      drivenBy: 'primary workplace'
+    },
+    "NY SDI": {
+      parameters: [
+        { id: 'nySDIRate', name: 'Weekly Rate', type: 'currency', value: '$0.50', readonly: true },
+        { id: 'nySDICap', name: 'Annual Cap', type: 'currency', value: '$26.00', readonly: true }
       ],
       drivenBy: 'primary workplace'
     }
