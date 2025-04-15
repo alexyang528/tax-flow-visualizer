@@ -55,11 +55,19 @@ export const taxData: TaxData = {
       ],
       drivenBy: 'primary workplace'
     },
-    "CA SUI": {
+    "CA State Unemployment Insurance Tax": {
       parameters: [
         { id: 'caSUIWage', name: 'YTD SUI Wages', type: 'currency', readonly: true },
         { id: 'caSUIRate', name: 'Rate', type: 'percentage', value: '3.4%', readonly: true },
         { id: 'caSUICap', name: 'Annual Cap', type: 'currency', value: '$7,000', readonly: true }
+      ],
+      drivenBy: 'primary workplace'
+    },
+    "California Employment Training Tax": {
+      parameters: [
+        { id: 'caETTWage', name: 'YTD ETT Wages', type: 'currency', readonly: true },
+        { id: 'caETTRate', name: 'Rate', type: 'percentage', value: '0.1%', readonly: true },
+        { id: 'caETTCap', name: 'Annual Cap', type: 'currency', value: '$7,000', readonly: true }
       ],
       drivenBy: 'primary workplace'
     }
@@ -81,7 +89,7 @@ export const taxData: TaxData = {
       ],
       drivenBy: 'residence'
     },
-    "NY State Unemployment Insurance": {
+    "New York State Unemployment Insurance Tax": {
       parameters: [
         { id: 'nySUIWage', name: 'YTD SUI Wages', type: 'currency', readonly: true },
         { id: 'nySUIRate', name: 'Rate', type: 'percentage', value: '2.1%', readonly: true },
@@ -128,6 +136,22 @@ export const taxData: TaxData = {
         { id: 'dcPFLRate', name: 'Rate', type: 'percentage', value: '0.62%', readonly: true }
       ],
       drivenBy: 'primary workplace'
+    },
+    "District of Columbia State Unemployment Insurance Tax": {
+      parameters: [
+        { id: 'dcSUIWage', name: 'YTD SUI Wages', type: 'currency', readonly: true },
+        { id: 'dcSUIRate', name: 'Rate', type: 'percentage', value: '2.7%', readonly: true },
+        { id: 'dcSUICap', name: 'Annual Cap', type: 'currency', value: '$9,000', readonly: true }
+      ],
+      drivenBy: 'primary workplace'
+    },
+    "DC Administrative Funding Tax": {
+      parameters: [
+        { id: 'dcAFTWage', name: 'YTD AFT Wages', type: 'currency', readonly: true },
+        { id: 'dcAFTRate', name: 'Rate', type: 'percentage', value: '0.2%', readonly: true },
+        { id: 'dcAFTCap', name: 'Annual Cap', type: 'currency', value: '$9,000', readonly: true }
+      ],
+      drivenBy: 'primary workplace'
     }
   },
   "New Jersey": {
@@ -139,7 +163,7 @@ export const taxData: TaxData = {
       ],
       drivenBy: 'residence, workplace'
     },
-    "NJ Unemployment Insurance": {
+    "New Jersey State Unemployment Insurance Tax": {
       parameters: [
         { id: 'njUIWage', name: 'YTD UI Wages', type: 'currency', readonly: true },
         { id: 'njUIRate', name: 'Rate', type: 'percentage', value: '0.3825%', readonly: true },
@@ -172,6 +196,14 @@ export const taxData: TaxData = {
         { id: 'vaAddlWithholding', name: 'Additional Withholding', type: 'currency' }
       ],
       drivenBy: 'residence, workplace'
+    },
+    "Virginia State Unemployment Insurance Tax": {
+      parameters: [
+        { id: 'vaSUIWage', name: 'YTD SUI Wages', type: 'currency', readonly: true },
+        { id: 'vaSUIRate', name: 'Rate', type: 'percentage', value: '2.5%', readonly: true },
+        { id: 'vaSUICap', name: 'Annual Cap', type: 'currency', value: '$8,000', readonly: true }
+      ],
+      drivenBy: 'primary workplace'
     }
   },
   "Connecticut": {
@@ -182,6 +214,22 @@ export const taxData: TaxData = {
         { id: 'ctAddlWithholding', name: 'Additional Withholding', type: 'currency' }
       ],
       drivenBy: 'residence, workplace'
+    },
+    "Connecticut State Unemployment Insurance Tax": {
+      parameters: [
+        { id: 'ctSUIWage', name: 'YTD SUI Wages', type: 'currency', readonly: true },
+        { id: 'ctSUIRate', name: 'Rate', type: 'percentage', value: '3.0%', readonly: true },
+        { id: 'ctSUICap', name: 'Annual Cap', type: 'currency', value: '$15,000', readonly: true }
+      ],
+      drivenBy: 'primary workplace'
+    },
+    "Connecticut Paid Leave": {
+      parameters: [
+        { id: 'ctPLWage', name: 'YTD PL Wages', type: 'currency', readonly: true },
+        { id: 'ctPLRate', name: 'Rate', type: 'percentage', value: '0.5%', readonly: true },
+        { id: 'ctPLCap', name: 'Annual Cap', type: 'currency', value: '$150,000', readonly: true }
+      ],
+      drivenBy: 'primary workplace'
     }
   },
   "Maryland": {
@@ -192,6 +240,14 @@ export const taxData: TaxData = {
         { id: 'mdAddlWithholding', name: 'Additional Withholding', type: 'currency' }
       ],
       drivenBy: 'residence, workplace'
+    },
+    "Maryland State Unemployment Insurance Tax": {
+      parameters: [
+        { id: 'mdSUIWage', name: 'YTD SUI Wages', type: 'currency', readonly: true },
+        { id: 'mdSUIRate', name: 'Rate', type: 'percentage', value: '2.6%', readonly: true },
+        { id: 'mdSUICap', name: 'Annual Cap', type: 'currency', value: '$8,500', readonly: true }
+      ],
+      drivenBy: 'primary workplace'
     }
   }
 };
