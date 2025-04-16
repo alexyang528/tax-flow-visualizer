@@ -9,11 +9,13 @@ interface TaxCardProps {
   isExempted: boolean;
   isExpanded: boolean;
   onToggleExpand: () => void;
-  onToggleExemption: () => void;
+  onToggleExemption?: () => void;
+  onAddTaxElection?: () => void;
   viewType: 'company' | 'employee';
   employee?: Employee;
   selectedWorkplace?: string;
   jurisdictionKey: string;
+  isOptional?: boolean;
 }
 
 const TaxCard = ({
@@ -23,10 +25,12 @@ const TaxCard = ({
   isExpanded,
   onToggleExpand,
   onToggleExemption,
+  onAddTaxElection,
   viewType,
   employee,
   selectedWorkplace,
-  jurisdictionKey
+  jurisdictionKey,
+  isOptional = false
 }: TaxCardProps) => {
   const drivenBy = taxConfig.drivenBy === null
     ? ''
@@ -49,13 +53,23 @@ const TaxCard = ({
           )}
         </h3>
         <div className="flex items-center">
-          <button
-            className={`ml-4 text-sm text-gray-600 hover:${isExempted ? 'text-green-600' : 'text-red-600'} focus:outline-none`}
-            onClick={onToggleExemption}
-            title={isExempted ? "Reinstate this tax" : "Exempt this tax"}
-          >
-            {isExempted ? 'Reinstate' : 'Exempt'}
-          </button>
+          {isOptional ? (
+            <button
+              className="ml-4 text-sm text-blue-600 hover:text-blue-800 focus:outline-none"
+              onClick={onAddTaxElection}
+              title="Add tax election"
+            >
+              Add Tax Election
+            </button>
+          ) : (
+            <button
+              className={`ml-4 text-sm text-gray-600 hover:${isExempted ? 'text-green-600' : 'text-red-600'} focus:outline-none`}
+              onClick={onToggleExemption}
+              title={isExempted ? "Reinstate this tax" : "Exempt this tax"}
+            >
+              {isExempted ? 'Reinstate' : 'Exempt'}
+            </button>
+          )}
           <span className={`ml-4 cursor-pointer ${isExempted ? 'text-gray-500' : ''}`} onClick={onToggleExpand}>
             {isExpanded ? '−' : '+'}
           </span>

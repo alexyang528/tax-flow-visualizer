@@ -29,6 +29,16 @@ const PayrollTaxDashboard = () => {
     "Connecticut": [],
     "Maryland": []
   });
+  const [electedTaxes, setElectedTaxes] = useState<ExemptedTaxes>({
+    Federal: [],
+    "New York": [],
+    California: [],
+    "District of Columbia": [],
+    "New Jersey": [],
+    "Virginia": [],
+    "Connecticut": [],
+    "Maryland": []
+  });
 
   const handleViewTypeToggle = (type: ViewType): void => {
     setViewType(type);
@@ -116,6 +126,18 @@ const PayrollTaxDashboard = () => {
                               activeJurisdiction.includes(" (Primary Workplace)") ||
                               activeJurisdiction.includes(" (Residence, Primary Workplace)");
 
+  const handleAddTaxElection = (jurisdiction: string, taxName: string): void => {
+    setElectedTaxes(prev => {
+      const updatedElections = { ...prev };
+      
+      if (!updatedElections[jurisdiction].includes(taxName)) {
+        updatedElections[jurisdiction] = [...updatedElections[jurisdiction], taxName];
+      }
+      
+      return updatedElections;
+    });
+  };
+
   return (
     <div className="max-w-6xl mx-auto p-6 bg-white rounded-lg shadow-lg">
       <h1 className="text-2xl font-bold mb-6">Payroll Tax Dashboard</h1>
@@ -153,9 +175,11 @@ const PayrollTaxDashboard = () => {
           activeJurisdiction={activeJurisdiction}
           viewType={viewType}
           exemptedTaxes={exemptedTaxes}
+          electedTaxes={electedTaxes}
           expanded={expanded}
           onToggleTaxExpansion={toggleTaxExpansion}
           onToggleTaxExemption={toggleTaxExemption}
+          onAddTaxElection={handleAddTaxElection}
           selectedEmployee={selectedEmployee}
           selectedWorkplace={selectedWorkplace}
         />
