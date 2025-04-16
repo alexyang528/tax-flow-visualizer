@@ -1,10 +1,10 @@
 import React from 'react';
 import { AlertCircle } from 'lucide-react';
-import { TaxData, ExemptedTaxes, ExpandedState, ViewType } from '@/types/payroll-tax-types';
+import { TaxData, ExemptedTaxes, ExpandedState, ViewType, Employee } from '@/types/payroll-tax-types';
 import TaxCard from './TaxCard';
 import { getApplicableTaxes } from '@/utils/tax-utils';
 import { taxData } from '@/data/tax-data';
-import { employees, workplaces } from '@/data/employee-data';
+import { workplaces } from '@/data/employee-data';
 
 interface TaxListProps {
   activeJurisdiction: string;
@@ -17,6 +17,7 @@ interface TaxListProps {
   onAddTaxElection: (jurisdiction: string, taxName: string) => void;
   selectedEmployee?: string;
   selectedWorkplace?: string;
+  employees: Employee[];
 }
 
 const TaxList = ({
@@ -29,7 +30,8 @@ const TaxList = ({
   onToggleTaxExemption,
   onAddTaxElection,
   selectedEmployee,
-  selectedWorkplace
+  selectedWorkplace,
+  employees
 }: TaxListProps) => {
   const jurisdictionKey = activeJurisdiction
     .replace(" (Residence)", "")
@@ -57,7 +59,8 @@ const TaxList = ({
     activeJurisdiction, 
     viewType,
     selectedEmployee,
-    selectedWorkplace
+    selectedWorkplace,
+    employees
   );
   
   const activeTaxes = applicableTaxes.filter(taxName => !exemptedTaxes[jurisdictionKey].includes(taxName));

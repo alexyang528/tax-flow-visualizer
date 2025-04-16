@@ -139,7 +139,8 @@ export const getApplicableTaxes = (
   jurisdiction: string,
   viewType: ViewType,
   selectedEmployee?: string,
-  selectedWorkplace?: string
+  selectedWorkplace?: string,
+  employees: Employee[] = []
 ) => {
   const jurisdictionKey = jurisdiction
     .replace(" (Residence, Primary Workplace)", "")
@@ -225,10 +226,14 @@ export const getApplicableTaxes = (
         }
       }
       
-      if (drivenByFactors.includes('primary workplace') && jurisdictionKey === primaryWorkplaceState) {
-        return true;
+      // Check for primary workplace-driven taxes
+      if (drivenByFactors.includes('primary workplace')) {
+        // Only include primary workplace taxes if this is the primary workplace state
+        // and the jurisdiction matches the primary workplace state
+        return jurisdictionKey === primaryWorkplaceState;
       }
       
+      // Check for workplace-driven taxes
       if (drivenByFactors.includes('workplace') && 
           (selectedWorkplace === 'all' || jurisdictionKey === selectedWorkplaceState)) {
         return true;

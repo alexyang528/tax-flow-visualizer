@@ -90,11 +90,38 @@ const PayrollTaxDashboard = () => {
       if (selectedEmployee === updatedEmployee.id) {
         setSelectedEmployee(updatedEmployee.id);
         
-        // If residence changed, update the active jurisdiction
         const oldEmployee = prev.find(emp => emp.id === updatedEmployee.id);
-        if (oldEmployee && oldEmployee.residence.state !== updatedEmployee.residence.state) {
-          // Set active jurisdiction to the new residence state
-          setActiveJurisdiction(`${updatedEmployee.residence.state} (Residence)`);
+        if (oldEmployee) {
+          // If residence changed, update the active jurisdiction
+          if (oldEmployee.residence.state !== updatedEmployee.residence.state) {
+            // Set active jurisdiction to the new residence state
+            setActiveJurisdiction(`${updatedEmployee.residence.state} (Residence)`);
+          }
+          
+          // If primary workplace changed, update the active jurisdiction
+          if (oldEmployee.primaryWorkplace !== updatedEmployee.primaryWorkplace) {
+            let newPrimaryWorkplaceState: string | null = null;
+            switch (updatedEmployee.primaryWorkplace) {
+              case 'hq':
+                newPrimaryWorkplaceState = 'New York';
+                break;
+              case 'branch-ca':
+                newPrimaryWorkplaceState = 'California';
+                break;
+              case 'remote-dc':
+                newPrimaryWorkplaceState = 'District of Columbia';
+                break;
+            }
+            
+            if (newPrimaryWorkplaceState) {
+              // If the new primary workplace state is the same as residence, combine them
+              if (newPrimaryWorkplaceState === updatedEmployee.residence.state) {
+                setActiveJurisdiction(`${newPrimaryWorkplaceState} (Residence, Primary Workplace)`);
+              } else {
+                setActiveJurisdiction(`${newPrimaryWorkplaceState} (Primary Workplace)`);
+              }
+            }
+          }
         }
       }
       
@@ -182,6 +209,7 @@ const PayrollTaxDashboard = () => {
           onAddTaxElection={handleAddTaxElection}
           selectedEmployee={selectedEmployee}
           selectedWorkplace={selectedWorkplace}
+          employees={employees}
         />
       )}
       
