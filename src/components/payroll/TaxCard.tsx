@@ -62,58 +62,110 @@ const TaxCard = ({
       .replace(" (Residence, Primary Workplace)", "");
 
     if (viewType === 'employee') {
-      if (!employee) return drivers;
+      if (selectedWorkplace === 'all') {
+        // For "All Employees", show all drivers across all employees
+        if (drivenByFactors.includes('residence')) {
+          const residentEmployees = employees
+            .filter(emp => emp.residence.state === cleanJurisdictionKey)
+            .map(emp => `Residence: ${emp.name} → ${emp.residence.state}`);
+          drivers.residences.push(...residentEmployees);
+        }
 
-      // Check residence
-      if (drivenByFactors.includes('residence') && employee.residence.state === cleanJurisdictionKey) {
-        drivers.residences.push(`Residence: ${employee.name} → ${employee.residence.state}`);
-      }
+        if (drivenByFactors.includes('primary workplace')) {
+          const primaryWorkplaces = workplaces
+            .filter(wp => {
+              switch (wp.id) {
+                case 'hq':
+                  return cleanJurisdictionKey === 'New York';
+                case 'branch-ca':
+                  return cleanJurisdictionKey === 'California';
+                case 'remote-dc':
+                  return cleanJurisdictionKey === 'District of Columbia';
+                default:
+                  return false;
+              }
+            })
+            .map(wp => {
+              const employeesWithPrimary = employees.filter(emp => emp.primaryWorkplace === wp.id);
+              return employeesWithPrimary.map(emp => `Primary Workplace: ${emp.name} → ${wp.name}`);
+            })
+            .flat();
+          drivers.primaryWorkplaces.push(...primaryWorkplaces);
+        }
 
-      // Check primary workplace
-      if (drivenByFactors.includes('primary workplace')) {
-        const primaryWorkplace = workplaces.find(wp => wp.id === employee.primaryWorkplace);
-        if (primaryWorkplace) {
-          const isInJurisdiction = (() => {
-            switch (primaryWorkplace.id) {
-              case 'hq':
-                return cleanJurisdictionKey === 'New York';
-              case 'branch-ca':
-                return cleanJurisdictionKey === 'California';
-              case 'remote-dc':
-                return cleanJurisdictionKey === 'District of Columbia';
-              default:
-                return false;
+        if (drivenByFactors.includes('workplace')) {
+          const applicableWorkplaces = workplaces
+            .filter(wp => {
+              switch (wp.id) {
+                case 'hq':
+                  return cleanJurisdictionKey === 'New York';
+                case 'branch-ca':
+                  return cleanJurisdictionKey === 'California';
+                case 'remote-dc':
+                  return cleanJurisdictionKey === 'District of Columbia';
+                default:
+                  return false;
+              }
+            })
+            .map(wp => {
+              const employeesWithWorkplace = employees.filter(emp => 
+                emp.workplaces.includes(wp.id) && emp.primaryWorkplace !== wp.id
+              );
+              return employeesWithWorkplace.map(emp => `Workplace: ${emp.name} → ${wp.name}`);
+            })
+            .flat();
+          drivers.workplaces.push(...applicableWorkplaces);
+        }
+      } else if (employee) {
+        // Single employee case
+        if (drivenByFactors.includes('residence') && employee.residence.state === cleanJurisdictionKey) {
+          drivers.residences.push(`Residence: ${employee.name} → ${employee.residence.state}`);
+        }
+
+        if (drivenByFactors.includes('primary workplace')) {
+          const primaryWorkplace = workplaces.find(wp => wp.id === employee.primaryWorkplace);
+          if (primaryWorkplace) {
+            const isInJurisdiction = (() => {
+              switch (primaryWorkplace.id) {
+                case 'hq':
+                  return cleanJurisdictionKey === 'New York';
+                case 'branch-ca':
+                  return cleanJurisdictionKey === 'California';
+                case 'remote-dc':
+                  return cleanJurisdictionKey === 'District of Columbia';
+                default:
+                  return false;
+              }
+            })();
+            
+            if (isInJurisdiction) {
+              drivers.primaryWorkplaces.push(`Primary Workplace: ${employee.name} → ${primaryWorkplace.name}`);
             }
-          })();
-          
-          if (isInJurisdiction) {
-            drivers.primaryWorkplaces.push(`Primary Workplace: ${employee.name} → ${primaryWorkplace.name}`);
           }
         }
-      }
 
-      // Check other workplaces
-      if (drivenByFactors.includes('workplace')) {
-        const applicableWorkplaces = employee.workplaces
-          .filter(wp => wp !== employee.primaryWorkplace)
-          .map(wpId => workplaces.find(wp => wp.id === wpId))
-          .filter((wp): wp is NonNullable<typeof wp> => wp !== undefined)
-          .filter(wp => {
-            switch (wp.id) {
-              case 'hq':
-                return cleanJurisdictionKey === 'New York';
-              case 'branch-ca':
-                return cleanJurisdictionKey === 'California';
-              case 'remote-dc':
-                return cleanJurisdictionKey === 'District of Columbia';
-              default:
-                return false;
-            }
-          })
-          .map(wp => `Workplace: ${employee.name} → ${wp.name}`);
+        if (drivenByFactors.includes('workplace')) {
+          const applicableWorkplaces = employee.workplaces
+            .filter(wp => wp !== employee.primaryWorkplace)
+            .map(wpId => workplaces.find(wp => wp.id === wpId))
+            .filter((wp): wp is NonNullable<typeof wp> => wp !== undefined)
+            .filter(wp => {
+              switch (wp.id) {
+                case 'hq':
+                  return cleanJurisdictionKey === 'New York';
+                case 'branch-ca':
+                  return cleanJurisdictionKey === 'California';
+                case 'remote-dc':
+                  return cleanJurisdictionKey === 'District of Columbia';
+                default:
+                  return false;
+              }
+            })
+            .map(wp => `Workplace: ${employee.name} → ${wp.name}`);
 
-        if (applicableWorkplaces.length > 0) {
-          drivers.workplaces.push(...applicableWorkplaces);
+          if (applicableWorkplaces.length > 0) {
+            drivers.workplaces.push(...applicableWorkplaces);
+          }
         }
       }
     } else {

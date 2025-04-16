@@ -1,15 +1,13 @@
-
 import React from 'react';
 import { AlertCircle } from 'lucide-react';
-import { Employee, ViewType } from '@/types/payroll-tax-types';
+import { Employee } from '@/types/payroll-tax-types';
 
 interface NoJurisdictionAlertProps {
-  viewType: ViewType;
   selectedEmployee: string;
   employees: Employee[];
 }
 
-const NoJurisdictionAlert = ({ viewType, selectedEmployee, employees }: NoJurisdictionAlertProps) => {
+const NoJurisdictionAlert = ({ selectedEmployee, employees }: NoJurisdictionAlertProps) => {
   return (
     <div className="bg-yellow-50 border-l-4 border-yellow-400 p-4">
       <div className="flex">
@@ -18,9 +16,9 @@ const NoJurisdictionAlert = ({ viewType, selectedEmployee, employees }: NoJurisd
         </div>
         <div className="ml-3">
           <p className="text-sm text-yellow-700">
-            {viewType === 'employee' 
-              ? `No tax data available for this jurisdiction based on ${employees.find(emp => emp.id === selectedEmployee)?.name}'s workplace assignments.`
-              : 'No tax data available for this jurisdiction with the selected workplace filter.'}
+            {selectedEmployee === 'all'
+              ? 'No tax data available for this jurisdiction across all employees.'
+              : `No tax data available for this jurisdiction based on ${employees.find(emp => emp.id === selectedEmployee)?.name}'s workplace assignments.`}
           </p>
         </div>
       </div>

@@ -30,6 +30,38 @@ export const getFilteredJurisdictions = (
   }
   
   else {
+    if (selectedEmployee === 'all') {
+      // For "All Employees", return all jurisdictions that have any employees
+      const jurisdictions = new Set<string>();
+      
+      // Add Federal jurisdiction
+      jurisdictions.add('Federal');
+      
+      // Add all states where employees have workplaces
+      employees.forEach(emp => {
+        emp.workplaces.forEach(wp => {
+          switch (wp) {
+            case 'hq':
+              jurisdictions.add('New York');
+              break;
+            case 'branch-ca':
+              jurisdictions.add('California');
+              break;
+            case 'remote-dc':
+              jurisdictions.add('District of Columbia');
+              break;
+          }
+        });
+        
+        // Add residence states
+        if (emp.residence?.state && taxData[emp.residence.state]) {
+          jurisdictions.add(emp.residence.state);
+        }
+      });
+      
+      return Array.from(jurisdictions);
+    }
+    
     if (!employee) return [];
     
     const applicableWorkplaces: string[] = [];
@@ -151,11 +183,78 @@ export const getApplicableTaxes = (
     return [];
   }
   
+  // Always return all Federal taxes if the jurisdiction is Federal
+  if (jurisdictionKey === 'Federal') {
+    return Object.keys(taxData[jurisdictionKey]);
+  }
+  
   if (viewType === 'company') {
     return Object.keys(taxData[jurisdictionKey]);
   }
   
   // For employee view, we need to filter based on drivenBy and context
+  if (selectedEmployee === 'all') {
+    // For "All Employees", return all taxes that apply to any employee
+    return Object.entries(taxData[jurisdictionKey])
+      .filter(([_, config]) => {
+        if (!config.drivenBy) return false;
+        const drivenByFactors = config.drivenBy.split(', ');
+        
+        // Check if any employee has this jurisdiction as their residence
+        if (drivenByFactors.includes('residence')) {
+          const hasResidentEmployee = employees.some(emp => 
+            emp.residence?.state === jurisdictionKey
+          );
+          if (hasResidentEmployee) return true;
+        }
+        
+        // Check if any employee has this jurisdiction as their primary workplace
+        if (drivenByFactors.includes('primary workplace')) {
+          const hasPrimaryWorkplaceEmployee = employees.some(emp => {
+            let primaryWorkplaceState: string | null = null;
+            switch (emp.primaryWorkplace) {
+              case 'hq':
+                primaryWorkplaceState = 'New York';
+                break;
+              case 'branch-ca':
+                primaryWorkplaceState = 'California';
+                break;
+              case 'remote-dc':
+                primaryWorkplaceState = 'District of Columbia';
+                break;
+            }
+            return primaryWorkplaceState === jurisdictionKey;
+          });
+          if (hasPrimaryWorkplaceEmployee) return true;
+        }
+        
+        // Check if any employee has this jurisdiction as a workplace
+        if (drivenByFactors.includes('workplace')) {
+          const hasWorkplaceEmployee = employees.some(emp => {
+            return emp.workplaces.some(wp => {
+              let workplaceState: string | null = null;
+              switch (wp) {
+                case 'hq':
+                  workplaceState = 'New York';
+                  break;
+                case 'branch-ca':
+                  workplaceState = 'California';
+                  break;
+                case 'remote-dc':
+                  workplaceState = 'District of Columbia';
+                  break;
+              }
+              return workplaceState === jurisdictionKey;
+            });
+          });
+          if (hasWorkplaceEmployee) return true;
+        }
+        
+        return false;
+      })
+      .map(([taxName]) => taxName);
+  }
+  
   const employee = employees.find(emp => emp.id === selectedEmployee);
   if (!employee) return [];
   
