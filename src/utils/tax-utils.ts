@@ -195,6 +195,22 @@ export const getApplicableTaxes = (
         break;
     }
   }
+
+  // Get all company workplace states
+  const companyWorkplaceStates = new Set<string>();
+  workplaces.forEach(wp => {
+    switch (wp.id) {
+      case 'hq':
+        companyWorkplaceStates.add('New York');
+        break;
+      case 'branch-ca':
+        companyWorkplaceStates.add('California');
+        break;
+      case 'remote-dc':
+        companyWorkplaceStates.add('District of Columbia');
+        break;
+    }
+  });
   
   return Object.entries(taxData[jurisdictionKey])
     .filter(([_, config]) => {
@@ -202,7 +218,11 @@ export const getApplicableTaxes = (
       
       // Check if this jurisdiction matches any of the drivenBy factors
       if (drivenByFactors.includes('residence') && jurisdictionKey === residenceState) {
-        return true;
+        // For residence-based taxes, check if company has a workplace in that state
+        if (!companyWorkplaceStates.has(jurisdictionKey)) {
+          // Mark as optional by adding a special prefix
+          return true;
+        }
       }
       
       if (drivenByFactors.includes('primary workplace') && jurisdictionKey === primaryWorkplaceState) {

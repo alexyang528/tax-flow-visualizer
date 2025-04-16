@@ -4,7 +4,7 @@ import { TaxData, ExemptedTaxes, ExpandedState, ViewType } from '@/types/payroll
 import TaxCard from './TaxCard';
 import { getApplicableTaxes } from '@/utils/tax-utils';
 import { taxData } from '@/data/tax-data';
-import { employees } from '@/data/employee-data';
+import { employees, workplaces } from '@/data/employee-data';
 
 interface TaxListProps {
   activeJurisdiction: string;
@@ -63,13 +63,40 @@ const TaxList = ({
 
   const employee = selectedEmployee ? employees.find(emp => emp.id === selectedEmployee) : undefined;
 
+  // Get all company workplace states
+  const companyWorkplaceStates = new Set<string>();
+  workplaces.forEach(wp => {
+    switch (wp.id) {
+      case 'hq':
+        companyWorkplaceStates.add('New York');
+        break;
+      case 'branch-ca':
+        companyWorkplaceStates.add('California');
+        break;
+      case 'remote-dc':
+        companyWorkplaceStates.add('District of Columbia');
+        break;
+    }
+  });
+
+  // Separate optional taxes (residence-based taxes where company doesn't have a workplace)
+  const optionalTaxes = activeTaxes.filter(taxName => {
+    const taxConfig = taxData[jurisdictionKey][taxName];
+    return taxConfig.drivenBy && 
+           taxConfig.drivenBy.includes('residence') && 
+           !companyWorkplaceStates.has(jurisdictionKey);
+  });
+
+  // Remove optional taxes from active taxes
+  const requiredActiveTaxes = activeTaxes.filter(taxName => !optionalTaxes.includes(taxName));
+
   return (
     <div>
       <div className="space-y-6 mb-8">
         <h3 className="text-lg font-semibold">
           Active Taxes
         </h3>
-        {activeTaxes.map(taxName => (
+        {requiredActiveTaxes.map(taxName => (
           <TaxCard
             key={taxName}
             taxName={taxName}
@@ -85,6 +112,34 @@ const TaxList = ({
           />
         ))}
       </div>
+
+      {optionalTaxes.length > 0 && (
+        <div className="mt-8 border-t pt-6">
+          <h3 className="text-lg font-semibold mb-4 text-blue-600">
+            Optional Taxes
+          </h3>
+          <p className="text-sm text-gray-600 mb-4">
+            These taxes are not required to be withheld since the company does not have a workplace in this state, but you may choose to opt in.
+          </p>
+          <div className="space-y-4">
+            {optionalTaxes.map(taxName => (
+              <TaxCard
+                key={taxName}
+                taxName={taxName}
+                taxConfig={taxData[jurisdictionKey][taxName]}
+                isExempted={false}
+                isExpanded={expanded[taxName] || false}
+                onToggleExpand={() => onToggleTaxExpansion(taxName)}
+                onToggleExemption={() => onToggleTaxExemption(jurisdictionKey, taxName)}
+                viewType={viewType}
+                employee={employee}
+                selectedWorkplace={selectedWorkplace}
+                jurisdictionKey={jurisdictionKey}
+              />
+            ))}
+          </div>
+        </div>
+      )}
 
       {exemptedApplicableTaxes.length > 0 && (
         <div className="mt-8 border-t pt-6">
