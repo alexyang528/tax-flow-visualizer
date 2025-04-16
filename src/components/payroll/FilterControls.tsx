@@ -1,70 +1,63 @@
-
 import React from 'react';
-import { Employee, Workplace, ViewType } from '@/types/payroll-tax-types';
+import { Form, Select, Space } from 'antd';
+import { ViewType, Employee } from '@/types/payroll-tax-types';
 
 interface FilterControlsProps {
   viewType: ViewType;
   selectedEmployee: string;
   selectedWorkplace: string;
   employees: Employee[];
-  workplaces: Workplace[];
+  workplaces: { id: string; name: string }[];
   onEmployeeChange: (employeeId: string) => void;
   onWorkplaceChange: (workplaceId: string) => void;
 }
 
-const FilterControls = ({
+const FilterControls: React.FC<FilterControlsProps> = ({
   viewType,
   selectedEmployee,
   selectedWorkplace,
   employees,
   workplaces,
   onEmployeeChange,
-  onWorkplaceChange
-}: FilterControlsProps) => {
+  onWorkplaceChange,
+}) => {
   return (
-    <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-      {viewType === 'employee' && (
-        <div>
-          <label className="block text-sm font-medium text-gray-700 mb-2">Select Employee:</label>
-          <select 
-            className="w-full p-2 border border-gray-300 rounded-md"
-            value={selectedEmployee}
-            onChange={(e) => onEmployeeChange(e.target.value)}
-            required
+    <Form layout="vertical">
+      <Space direction="horizontal" size="middle">
+        {viewType === 'employee' && (
+          <Form.Item label="Select Employee">
+            <Select
+              value={selectedEmployee}
+              onChange={onEmployeeChange}
+              style={{ width: 200 }}
+              placeholder="Select an employee"
+            >
+              {employees.map((employee) => (
+                <Select.Option key={employee.id} value={employee.id}>
+                  {employee.name}
+                </Select.Option>
+              ))}
+            </Select>
+          </Form.Item>
+        )}
+        
+        <Form.Item label="Filter by Workplace">
+          <Select
+            value={selectedWorkplace}
+            onChange={onWorkplaceChange}
+            style={{ width: 200 }}
+            placeholder="Select a workplace"
           >
-            <option value="" disabled>Select an employee</option>
-            {employees.map(employee => (
-              <option key={employee.id} value={employee.id}>{employee.name}</option>
+            <Select.Option value="all">All Workplaces</Select.Option>
+            {workplaces.map((workplace) => (
+              <Select.Option key={workplace.id} value={workplace.id}>
+                {workplace.name}
+              </Select.Option>
             ))}
-          </select>
-        </div>
-      )}
-      
-      <div>
-        <label className="block text-sm font-medium text-gray-700 mb-2">
-          {viewType === 'company' ? 'Filter by Workplace:' : 'Filter by Employee Workplace:'}
-        </label>
-        <select 
-          className="w-full p-2 border border-gray-300 rounded-md"
-          value={selectedWorkplace}
-          onChange={(e) => onWorkplaceChange(e.target.value)}
-        >
-          <option value="all">All Workplaces</option>
-          {viewType === 'employee' && selectedEmployee ? 
-            employees.find(emp => emp.id === selectedEmployee)?.workplaces.map(wpId => {
-              const workplace = workplaces.find(wp => wp.id === wpId);
-              return workplace ? (
-                <option key={workplace.id} value={workplace.id}>{workplace.name}</option>
-              ) : null;
-            })
-            :
-            workplaces.filter(wp => wp.id !== 'all').map(workplace => (
-              <option key={workplace.id} value={workplace.id}>{workplace.name}</option>
-            ))
-          }
-        </select>
-      </div>
-    </div>
+          </Select>
+        </Form.Item>
+      </Space>
+    </Form>
   );
 };
 

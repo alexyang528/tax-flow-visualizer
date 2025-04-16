@@ -1,5 +1,5 @@
-
 import React from 'react';
+import { Radio } from 'antd';
 import { ViewType } from '@/types/payroll-tax-types';
 
 interface ViewTypeToggleProps {
@@ -7,30 +7,17 @@ interface ViewTypeToggleProps {
   onToggle: (type: ViewType) => void;
 }
 
-const ViewTypeToggle = ({ viewType, onToggle }: ViewTypeToggleProps) => {
+const ViewTypeToggle: React.FC<ViewTypeToggleProps> = ({ viewType, onToggle }) => {
   return (
-    <div className="flex space-x-2 mb-4">
-      <button
-        className={`px-4 py-2 rounded-lg font-medium ${
-          viewType === 'company' 
-            ? 'bg-blue-600 text-white' 
-            : 'bg-gray-200 text-gray-700 hover:bg-gray-300'
-        }`}
-        onClick={() => onToggle('company')}
-      >
-        Entire Company
-      </button>
-      <button
-        className={`px-4 py-2 rounded-lg font-medium ${
-          viewType === 'employee' 
-            ? 'bg-blue-600 text-white' 
-            : 'bg-gray-200 text-gray-700 hover:bg-gray-300'
-        }`}
-        onClick={() => onToggle('employee')}
-      >
-        By Employee
-      </button>
-    </div>
+    <Radio.Group
+      value={viewType}
+      onChange={(e) => onToggle(e.target.value)}
+      optionType="button"
+      buttonStyle="solid"
+    >
+      <Radio.Button value="company">Company View</Radio.Button>
+      <Radio.Button value="employee">Employee View</Radio.Button>
+    </Radio.Group>
   );
 };
 

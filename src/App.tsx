@@ -1,18 +1,28 @@
-import { Toaster } from "@/components/ui/toaster";
-import { Toaster as Sonner } from "@/components/ui/sonner";
-import { TooltipProvider } from "@/components/ui/tooltip";
 import { QueryClient, QueryClientProvider } from "@tanstack/react-query";
 import { BrowserRouter, Routes, Route } from "react-router-dom";
 import Index from "./pages/Index";
 import NotFound from "./pages/NotFound";
+import { ConfigProvider, message } from 'antd';
+import PayrollTaxDashboard from './components/PayrollTaxDashboard';
 
 const queryClient = new QueryClient();
 
+// Configure message duration
+message.config({
+  duration: 3,
+  maxCount: 3,
+});
+
 const App = () => (
   <QueryClientProvider client={queryClient}>
-    <TooltipProvider>
-      <Toaster />
-      <Sonner />
+    <ConfigProvider
+      theme={{
+        token: {
+          colorPrimary: '#1677ff',
+          borderRadius: 6,
+        },
+      }}
+    >
       <BrowserRouter>
         <Routes>
           <Route path="/" element={<Index />} />
@@ -20,7 +30,8 @@ const App = () => (
           <Route path="*" element={<NotFound />} />
         </Routes>
       </BrowserRouter>
-    </TooltipProvider>
+      <PayrollTaxDashboard />
+    </ConfigProvider>
   </QueryClientProvider>
 );
 

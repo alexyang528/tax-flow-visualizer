@@ -1,4 +1,5 @@
 import React, { useState, useMemo } from 'react';
+import { Card, Typography, Space } from 'antd';
 import { employees as initialEmployees, workplaces } from '@/data/employee-data';
 import { taxData } from '@/data/tax-data';
 import { getFilteredJurisdictions } from '@/utils/tax-utils';
@@ -11,6 +12,8 @@ import JurisdictionTabs from './payroll/JurisdictionTabs';
 import TaxList from './payroll/TaxList';
 import NoJurisdictionAlert from './payroll/NoJurisdictionAlert';
 import NoEmployeeAlert from './payroll/NoEmployeeAlert';
+
+const { Title } = Typography;
 
 const PayrollTaxDashboard = () => {
   const [employees, setEmployees] = useState(initialEmployees);
@@ -166,10 +169,10 @@ const PayrollTaxDashboard = () => {
   };
 
   return (
-    <div className="max-w-6xl mx-auto p-6 bg-white rounded-lg shadow-lg">
-      <h1 className="text-2xl font-bold mb-6">Payroll Tax Dashboard</h1>
+    <Card className="max-w-6xl mx-auto">
+      <Title level={2}>Payroll Tax Dashboard</Title>
       
-      <div className="mb-6">
+      <Space direction="vertical" size="large" style={{ width: '100%' }}>
         <ViewTypeToggle viewType={viewType} onToggle={handleViewTypeToggle} />
         
         {viewType === 'employee' && selectedEmployee && (
@@ -189,42 +192,42 @@ const PayrollTaxDashboard = () => {
           onEmployeeChange={handleEmployeeChange}
           onWorkplaceChange={handleWorkplaceChange}
         />
-      </div>
-      
-      <JurisdictionTabs
-        jurisdictions={filteredJurisdictions}
-        activeJurisdiction={activeJurisdiction}
-        onJurisdictionChange={setActiveJurisdiction}
-      />
-      
-      {isValidJurisdiction && (
-        <TaxList
+        
+        <JurisdictionTabs
+          jurisdictions={filteredJurisdictions}
           activeJurisdiction={activeJurisdiction}
-          viewType={viewType}
-          exemptedTaxes={exemptedTaxes}
-          electedTaxes={electedTaxes}
-          expanded={expanded}
-          onToggleTaxExpansion={toggleTaxExpansion}
-          onToggleTaxExemption={toggleTaxExemption}
-          onAddTaxElection={handleAddTaxElection}
-          selectedEmployee={selectedEmployee}
-          selectedWorkplace={selectedWorkplace}
-          employees={employees}
+          onJurisdictionChange={setActiveJurisdiction}
         />
-      )}
-      
-      {!isValidJurisdiction && (
-        <NoJurisdictionAlert
-          viewType={viewType}
-          selectedEmployee={selectedEmployee}
-          employees={employees}
-        />
-      )}
-      
-      {viewType === 'employee' && !selectedEmployee && (
-        <NoEmployeeAlert />
-      )}
-    </div>
+        
+        {isValidJurisdiction && (
+          <TaxList
+            activeJurisdiction={activeJurisdiction}
+            viewType={viewType}
+            exemptedTaxes={exemptedTaxes}
+            electedTaxes={electedTaxes}
+            expanded={expanded}
+            onToggleTaxExpansion={toggleTaxExpansion}
+            onToggleTaxExemption={toggleTaxExemption}
+            onAddTaxElection={handleAddTaxElection}
+            selectedEmployee={selectedEmployee}
+            selectedWorkplace={selectedWorkplace}
+            employees={employees}
+          />
+        )}
+        
+        {!isValidJurisdiction && (
+          <NoJurisdictionAlert
+            viewType={viewType}
+            selectedEmployee={selectedEmployee}
+            employees={employees}
+          />
+        )}
+        
+        {viewType === 'employee' && !selectedEmployee && (
+          <NoEmployeeAlert />
+        )}
+      </Space>
+    </Card>
   );
 };
 

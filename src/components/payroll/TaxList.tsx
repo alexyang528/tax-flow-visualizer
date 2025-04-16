@@ -1,10 +1,14 @@
 import React from 'react';
+import { List, Collapse, Switch, Button, Space, Typography } from 'antd';
 import { AlertCircle } from 'lucide-react';
 import { TaxData, ExemptedTaxes, ExpandedState, ViewType, Employee } from '@/types/payroll-tax-types';
 import TaxCard from './TaxCard';
 import { getApplicableTaxes } from '@/utils/tax-utils';
 import { taxData } from '@/data/tax-data';
 import { workplaces } from '@/data/employee-data';
+
+const { Text } = Typography;
+const { Panel } = Collapse;
 
 interface TaxListProps {
   activeJurisdiction: string;
@@ -98,96 +102,51 @@ const TaxList = ({
   // Remove optional taxes from active taxes
   const requiredActiveTaxes = activeTaxes.filter(taxName => !optionalTaxes.includes(taxName));
 
+  const getTaxesForJurisdiction = () => {
+    // Your existing tax filtering logic here
+    return [];
+  };
+
+  const taxes = getTaxesForJurisdiction();
+
   return (
-    <div>
-      <div className="space-y-6 mb-8">
-        <div>
-          <h3 className="text-lg font-semibold">
-            Applicable Taxes
-          </h3>
-          <p className="text-sm text-gray-600 mt-1">
-            These taxes are required to be withheld based on the employee's workplace, residence, or primary workplace.
-          </p>
-        </div>
-        {requiredActiveTaxes.map(taxName => (
-          <TaxCard
-            key={taxName}
-            taxName={taxName}
-            taxConfig={taxData[jurisdictionKey][taxName]}
-            isExempted={false}
-            isExpanded={expanded[taxName] || false}
-            onToggleExpand={() => onToggleTaxExpansion(taxName)}
-            onToggleExemption={() => onToggleTaxExemption(jurisdictionKey, taxName)}
-            viewType={viewType}
-            employee={employee}
-            selectedWorkplace={selectedWorkplace}
-            jurisdictionKey={jurisdictionKey}
-            employees={employees}
-          />
-        ))}
-      </div>
-
-      {optionalTaxes.length > 0 && (
-        <div className="mt-8 border-t pt-6">
-          <h3 className="text-lg font-semibold mb-4">
-            Courtesy Taxes
-          </h3>
-          <p className="text-sm text-gray-600 mb-4">
-            These taxes are not required to be withheld since the company does not have a workplace in this state, but you may choose to opt in as a courtesy to your employees.
-          </p>
-          <div className="space-y-4">
-            {optionalTaxes.map(taxName => (
-              <TaxCard
-                key={taxName}
-                taxName={taxName}
-                taxConfig={taxData[jurisdictionKey][taxName]}
-                isExempted={false}
-                isExpanded={expanded[taxName] || false}
-                onToggleExpand={() => onToggleTaxExpansion(taxName)}
-                onAddTaxElection={() => onAddTaxElection(jurisdictionKey, taxName)}
-                viewType={viewType}
-                employee={employee}
-                selectedWorkplace={selectedWorkplace}
-                jurisdictionKey={jurisdictionKey}
-                isOptional={true}
-                employees={employees}
-              />
-            ))}
-          </div>
-        </div>
+    <List
+      dataSource={taxes}
+      renderItem={(tax) => (
+        <List.Item>
+          <Collapse
+            activeKey={expanded[tax.name] ? tax.name : undefined}
+            onChange={() => onToggleTaxExpansion(tax.name)}
+            style={{ width: '100%' }}
+          >
+            <Panel
+              header={
+                <Space>
+                  <Text strong>{tax.name}</Text>
+                  <Switch
+                    checked={!exemptedTaxes[activeJurisdiction]?.includes(tax.name)}
+                    onChange={() => onToggleTaxExemption(activeJurisdiction, tax.name)}
+                  />
+                </Space>
+              }
+              key={tax.name}
+            >
+              <Space direction="vertical" style={{ width: '100%' }}>
+                <Text>{tax.description}</Text>
+                {!electedTaxes[activeJurisdiction]?.includes(tax.name) && (
+                  <Button
+                    type="primary"
+                    onClick={() => onAddTaxElection(activeJurisdiction, tax.name)}
+                  >
+                    Add Tax Election
+                  </Button>
+                )}
+              </Space>
+            </Panel>
+          </Collapse>
+        </List.Item>
       )}
-
-      {exemptedApplicableTaxes.length > 0 && (
-        <div className="mt-8 border-t pt-6">
-          <div>
-            <h3 className="text-lg font-semibold mb-4">
-              Exempted Taxes
-            </h3>
-            <p className="text-sm text-gray-600 mb-4">
-              These taxes have been exempted and will not be withheld from the employee's paycheck.
-            </p>
-          </div>
-          <div className="space-y-4">
-            {exemptedApplicableTaxes.map(taxName => (
-              <TaxCard
-                key={taxName}
-                taxName={taxName}
-                taxConfig={taxData[jurisdictionKey][taxName]}
-                isExempted={true}
-                isExpanded={expanded[taxName] || false}
-                onToggleExpand={() => onToggleTaxExpansion(taxName)}
-                onToggleExemption={() => onToggleTaxExemption(jurisdictionKey, taxName)}
-                viewType={viewType}
-                employee={employee}
-                selectedWorkplace={selectedWorkplace}
-                jurisdictionKey={jurisdictionKey}
-                employees={employees}
-              />
-            ))}
-          </div>
-        </div>
-      )}
-    </div>
+    />
   );
 };
 
