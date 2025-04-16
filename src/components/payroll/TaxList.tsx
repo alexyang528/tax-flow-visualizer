@@ -122,6 +122,7 @@ const TaxList = ({
             employee={employee}
             selectedWorkplace={selectedWorkplace}
             jurisdictionKey={jurisdictionKey}
+            employees={employees}
           />
         ))}
       </div>
@@ -149,6 +150,7 @@ const TaxList = ({
                 selectedWorkplace={selectedWorkplace}
                 jurisdictionKey={jurisdictionKey}
                 isOptional={true}
+                employees={employees}
               />
             ))}
           </div>
@@ -179,6 +181,7 @@ const TaxList = ({
                 employee={employee}
                 selectedWorkplace={selectedWorkplace}
                 jurisdictionKey={jurisdictionKey}
+                employees={employees}
               />
             ))}
           </div>
